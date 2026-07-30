@@ -13,7 +13,16 @@
       "color": "#B91C1C"
     },
     "gif": null,
-    "image": null
+    "image": null,
+    "goodbye": {
+      "embed": {
+        "title": "◈│Selamat Tinggal, {user}",
+        "description": "❖ Sampai jumpa, {mention}.\n\nTerima kasih telah menjadi bagian dari **{server}**.\n\n✦ Semoga sukses di mana pun langkahmu membawamu.\n\n━━━━━━━━━━━━━━━━━━\n⚔️ Sampai Bertemu Lagi\n━━━━━━━━━━━━━━━━━━",
+        "color": "#9CA3AF"
+      },
+      "gif": null,
+      "image": null
+    }
   },
   "takeRole": {
     "enabled": true,
@@ -50,15 +59,15 @@
     ]
   },
   "invite": {
-    "enabled": false,
-    "logChannelId": null,
-    "joinChannelId": null,
+    "enabled": true,
+    "logChannelId": "1532403653489594541",
+    "joinChannelId": "1532403653489594541",
     "embed": {
-      "title": "👋 {user} bergabung ke {server}!",
-      "description": "Diundang oleh **{inviter}** menggunakan kode `{inviteCode}`.\nTotal invite: **{totalInvites}** | Fake: **{fakeInvites}** | Pergi: **{leaveInvites}**",
+      "title": "✦ {user} bergabung ke {server}",
+      "description": "━━━━━━━━━━━━━━━━━━\n\n👋 Member:\n{mention}\n\n👤 Diundang oleh:\n**{inviter}**\n\n📊 Statistik Invite\n├ ✦ Total  : **{totalInvites}**\n├ ✦ Fake   : **{fakeInvites}**\n└ ✦ Keluar : **{leaveInvites}**\n\n✨ Selamat datang di **{server}**!\n\n━━━━━━━━━━━━━━━━━━",
       "color": "#5865F2",
       "thumbnail": null,
-      "footer": "Invite Tracker",
+      "footer": "◈ Crimson System • Invite Tracker",
       "image": null,
       "gif": null
     },

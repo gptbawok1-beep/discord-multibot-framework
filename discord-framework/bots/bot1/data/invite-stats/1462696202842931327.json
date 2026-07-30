@@ -1,0 +1,19 @@
+{
+  "members": {
+    "1462685321262272664": {
+      "total": 1,
+      "fake": 0,
+      "left": 0,
+      "rejoin": 0,
+      "bonus": 0
+    }
+  },
+  "joins": {
+    "1526499408282390619": {
+      "inviterId": "1462685321262272664",
+      "inviteCode": "AcH3jVRrH",
+      "joinedAt": 1785434312140,
+      "isRejoin": false
+    }
+  }
+}
