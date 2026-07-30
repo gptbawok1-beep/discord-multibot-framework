@@ -51,14 +51,14 @@
   },
   "invite": {
     "enabled": true,
-    "logChannelId": null,
-    "joinChannelId": null,
+    "logChannelId": "1524813487828635808",
+    "joinChannelId": "1524813487828635808",
     "embed": {
-      "title": "👋 {user} bergabung ke {server}!",
-      "description": "Diundang oleh **{inviter}** menggunakan kode `{inviteCode}`.\nTotal invite: **{totalInvites}** | Fake: **{fakeInvites}** | Pergi: **{leaveInvites}**",
+      "title": "✦ {user} bergabung ke {server}",
+      "description": "━━━━━━━━━━━━━━━━━━\n👤 Diundang oleh: **{inviter}**\n🔗 Kode Invite: **{inviteCode}**\n\n📊 Statistik Invite\n├ ✦ Total : **{totalInvites}**\n├ ✦ Fake : **{fakeInvites}**\n└ ✦ Keluar : **{leaveInvites}**\n\n✨ Selamat datang di server!\n━━━━━━━━━━━━━━━━━━",
       "color": "#5865F2",
       "thumbnail": null,
-      "footer": "Invite Tracker",
+      "footer": "✦ Welcome to the Shadow Realm",
       "image": null,
       "gif": null
     },

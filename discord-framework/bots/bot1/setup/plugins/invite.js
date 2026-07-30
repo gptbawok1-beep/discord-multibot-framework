@@ -294,7 +294,7 @@ const plugin = {
         new ActionRowBuilder().addComponents(
           new TextInputBuilder()
             .setCustomId('thumbnail')
-            .setLabel('URL Thumbnail (kosongkan untuk default avatar)')
+            .setLabel('URL Thumbnail (kosong = avatar member)')
             .setStyle(TextInputStyle.Short)
             .setValue(embedCfg.thumbnail ?? '')
             .setMaxLength(512)
