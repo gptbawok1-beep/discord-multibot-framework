@@ -1,0 +1,1 @@
+- [Channel Manager Plugin](channel-manager.md) — full button impl: Backup/Restore/Generate/Clone/Rename/Delete/Preview; uses updateSection+loadGuildConfig; modals need isFromMessage()=true for update()

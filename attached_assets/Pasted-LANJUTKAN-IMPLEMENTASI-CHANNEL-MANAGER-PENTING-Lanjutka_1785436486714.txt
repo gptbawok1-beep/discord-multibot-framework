@@ -1,0 +1,227 @@
+LANJUTKAN IMPLEMENTASI CHANNEL MANAGER
+PENTING
+Lanjutkan project yang sudah ada.
+JANGAN membuat project baru.
+JANGAN mengubah Shared Core.
+JANGAN mengubah Setup Engine.
+JANGAN mengubah struktur project.
+JANGAN mengubah UI Channel Manager yang sudah ada.
+JANGAN mengubah tombol yang sudah ada.
+JANGAN memindahkan folder.
+JANGAN menghapus kode yang sudah berjalan.
+JANGAN melakukan refactor besar.
+Fokus hanya mengimplementasikan fungsi pada tombol-tombol Channel Manager yang sudah ada.
+GUNAKAN FONDASI YANG SUDAH ADA
+Semua implementasi WAJIB menggunakan sistem yang sudah dibuat sebelumnya:
+Shared Setup Engine
+Shared Config
+Shared Storage
+Persistent Config
+Auto Recovery
+Draft → Preview → Save
+Validation
+Permission System
+Backup System
+Auto Plugin Loader
+Jangan membuat sistem baru.
+IMPLEMENTASI GENERATE STRUCTURE
+Implementasikan tombol:
+🏗 Generate Structure
+Cara Kerja
+Saat tombol ditekan:
+Bot membuka Discord Modal.
+Owner cukup menempelkan (paste) struktur server.
+Contoh:
+📂 INFORMATION
+#rules
+#welcome
+#announcements
+
+📂 GENERAL
+#chat
+#media
+#bot
+
+📂 SUPPORT
+#help
+#report
+
+📂 VOICE
+🔊 General
+🔊 Music
+🔊 Gaming
+Bot HARUS dapat membaca struktur seperti manusia.
+Tidak perlu format yang kaku.
+Parser harus fleksibel.
+Contoh lain yang juga harus dikenali:
+CATEGORY: INFORMATION
+TEXT: rules
+TEXT: welcome
+
+CATEGORY: VOICE
+VOICE: General
+VOICE: Music
+Bot harus mampu mengenali beberapa format umum tanpa owner harus menyesuaikan format tertentu.
+PARSER
+Bot membaca seluruh struktur.
+Bot mengelompokkan:
+Category
+Text Channel
+Voice Channel
+Stage Channel (jika ada)
+Parser harus toleran terhadap:
+Emoji
+Bullet
+Nomor
+Spasi berlebih
+Huruf besar/kecil
+Format yang sedikit berbeda
+PREVIEW
+Setelah parsing selesai:
+JANGAN langsung membuat channel.
+Tampilkan Preview.
+Contoh:
+Preview Structure
+
+Category :
+4
+
+Text Channel :
+10
+
+Voice Channel :
+3
+
+Stage Channel :
+0
+
+Semua struktur berhasil dipahami.
+
+[Generate]
+
+[Cancel]
+VALIDATION
+Sebelum Generate:
+Periksa:
+Bot memiliki Manage Channels
+Bot memiliki Manage Roles jika diperlukan
+Jumlah channel tidak melebihi batas Discord
+Nama channel valid
+Parent Category valid
+Jika gagal:
+Jangan crash.
+Tampilkan alasan.
+GENERATE
+Jika owner menekan Generate:
+Bot membuat:
+Category
+Text Channel
+Voice Channel
+Stage Channel
+Urutan HARUS sama dengan struktur yang diberikan owner.
+Parent Category harus otomatis diatur.
+KONFLIK
+Jika ditemukan channel atau category dengan nama yang sama:
+Jangan langsung gagal.
+Tampilkan pilihan:
+Skip
+Rename Otomatis
+Replace
+Owner memilih tindakan.
+ERROR HANDLING
+Jika satu channel gagal dibuat:
+Lanjutkan membuat channel lainnya.
+Jangan menghentikan seluruh proses.
+Di akhir tampilkan laporan.
+Contoh:
+Generate selesai.
+
+Category : 4/4
+
+Text : 10/10
+
+Voice : 3/3
+
+Gagal : 1
+
+Error:
+
+#rules sudah ada.
+BACKUP
+Tombol:
+💾 Backup Channels
+Harus benar-benar membuat backup struktur server.
+Minimal menyimpan:
+Category
+Text Channel
+Voice Channel
+Stage Channel
+Parent Category
+Posisi
+Topic
+Slowmode
+NSFW
+Permission Overwrite
+Bitrate
+User Limit
+Backup menggunakan Shared Storage.
+RESTORE
+Tombol:
+♻ Restore
+Mengembalikan struktur dari Backup.
+Restore menggunakan Preview terlebih dahulu.
+Jangan langsung menerapkan perubahan.
+CLONE
+Tombol:
+📋 Clone
+Owner memilih Channel atau Category melalui Discord Channel Select Menu.
+Bot membuat salinan lengkap.
+RENAME
+Tombol:
+✏ Rename
+Gunakan Modal Discord.
+Owner memasukkan nama baru.
+Validasi nama sebelum diterapkan.
+DELETE
+Tombol:
+🗑 Delete
+Gunakan Channel Select Menu.
+Sebelum menghapus tampilkan konfirmasi.
+PREVIEW STRUCTURE
+Tombol:
+👁 Preview Structure
+Menampilkan seluruh struktur server saat ini.
+Contoh:
+📂 INFORMATION
+#rules
+#welcome
+📂 GENERAL
+#chat
+#media
+📂 VOICE
+🔊 General
+🔊 Music
+Tidak melakukan perubahan apa pun.
+AUTO RECOVERY
+Semua Backup, Draft, dan Config harus tetap tersedia setelah:
+Restart Bot
+Restart Hosting
+Restart VPS
+Restart Railway
+Restart Replit
+Restart Pterodactyl
+Deploy ulang
+Update project
+Owner tidak boleh mengulang Setup.
+KOMPATIBILITAS
+Semua implementasi HARUS kompatibel dengan:
+Take Role
+Welcome
+Goodbye
+Invite Tracker
+Jangan mengubah API internal.
+Jangan merusak plugin yang sudah ada.
+PENYELESAIAN
+Jangan menyatakan implementasi selesai sebelum seluruh tombol Channel Manager benar-benar memiliki fungsi yang bekerja.
+Lakukan pengujian terhadap setiap tombol.
+Pastikan tidak ada Promise Rejection, Import Error, Runtime Error, maupun konflik dengan plugin lain.
