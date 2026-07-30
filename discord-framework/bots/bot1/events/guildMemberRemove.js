@@ -2,12 +2,15 @@
  * Bot 1 — Event: guildMemberRemove
  *
  * Fires when a member leaves a guild (kick, ban, or voluntary leave).
- * Routes to the Invite Tracker runtime handler to update leave/fake stats.
+ * Routes to:
+ *   1. Welcome handler  — sends goodbye embed (if welcome.enabled)
+ *   2. Invite Tracker   — updates leave/fake stats (if invite.enabled)
  */
 
 import { BaseEvent } from '../../../shared/structures/index.js';
 import { createLogger } from '../../../shared/logger/index.js';
-import { onGuildMemberRemove } from '../features/inviteTracker/handler.js';
+import { onGuildMemberRemove as welcomeOnRemove } from '../features/welcome/handler.js';
+import { onGuildMemberRemove as inviteOnRemove }  from '../features/inviteTracker/handler.js';
 
 const logger = createLogger('BOT1');
 
@@ -17,8 +20,16 @@ export default class GuildMemberRemoveEvent extends BaseEvent {
   }
 
   async execute(client, member) {
+    // Welcome handler — send goodbye embed
     try {
-      await onGuildMemberRemove(member);
+      await welcomeOnRemove(member);
+    } catch (err) {
+      logger.error(`[guildMemberRemove] Error in Welcome/Goodbye handler: ${err.message}`);
+    }
+
+    // Invite Tracker handler — record leave, update inviter stats
+    try {
+      await inviteOnRemove(member);
     } catch (err) {
       logger.error(`[guildMemberRemove] Error in InviteTracker handler: ${err.message}`);
     }

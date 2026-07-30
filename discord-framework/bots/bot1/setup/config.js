@@ -39,6 +39,11 @@ export function defaultConfig() {
       embed:     { title: 'Selamat Datang, {user}!', description: '', color: '#5865F2' },
       gif:       null,
       image:     null,
+      goodbye: {
+        embed: { title: 'Selamat Tinggal, {user}!', description: '{mention} telah meninggalkan **{server}**.', color: '#5865F2' },
+        gif:   null,
+        image: null,
+      },
     },
     takeRole: {
       enabled: false,
