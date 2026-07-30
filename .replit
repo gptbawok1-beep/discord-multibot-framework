@@ -41,3 +41,8 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+BOT1_CLIENT_ID = "1532306835132911696"
