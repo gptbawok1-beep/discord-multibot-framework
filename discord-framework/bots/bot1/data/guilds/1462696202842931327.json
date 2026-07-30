@@ -5,7 +5,7 @@
     "timezone": "Asia/Jakarta"
   },
   "welcome": {
-    "enabled": false,
+    "enabled": true,
     "channelId": null,
     "embed": {
       "title": "Selamat Datang, {user}!",
@@ -50,7 +50,18 @@
     ]
   },
   "invite": {
-    "enabled": false,
+    "enabled": true,
+    "logChannelId": null,
+    "joinChannelId": null,
+    "embed": {
+      "title": "👋 {user} bergabung ke {server}!",
+      "description": "Diundang oleh **{inviter}** menggunakan kode `{inviteCode}`.\nTotal invite: **{totalInvites}** | Fake: **{fakeInvites}** | Pergi: **{leaveInvites}**",
+      "color": "#5865F2",
+      "thumbnail": null,
+      "footer": "Invite Tracker",
+      "image": null,
+      "gif": null
+    },
     "channelId": null,
     "logsChannelId": null,
     "leaderboardChannelId": null
