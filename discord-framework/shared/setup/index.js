@@ -20,3 +20,4 @@ export {
   buildValidationErrorEmbed,
   buildPermissionDeniedEmbed,
 } from './validation.js';
+export { createPluginLoader } from './pluginLoader.js';
