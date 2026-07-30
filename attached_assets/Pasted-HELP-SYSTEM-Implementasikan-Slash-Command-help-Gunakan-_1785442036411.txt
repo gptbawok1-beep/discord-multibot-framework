@@ -1,0 +1,116 @@
+HELP SYSTEM
+Implementasikan Slash Command:
+/help
+Gunakan UI yang konsisten dengan Setup System.
+Jangan membuat UI baru.
+Gunakan komponen Discord yang sudah digunakan pada Setup System.
+HELP CENTER
+Saat /help dijalankan tampilkan satu Embed:
+📚 Help Center
+
+Pilih kategori yang ingin dipelajari.
+
+━━━━━━━━━━━━━━━━━━
+
+🏠 Welcome & Goodbye
+
+🎭 Take Role
+
+🔗 Invite Tracker
+
+🏗️ Channel Manager
+
+🛡️ Moderation
+
+📜 Logs
+(Hanya tampil jika sudah tersedia)
+
+💾 Backup Manager
+(Hanya tampil jika sudah tersedia)
+
+🎉 Giveaway
+(Hanya tampil jika sudah tersedia)
+
+🎫 Ticket Center
+(Hanya tampil jika sudah tersedia)
+Di bawah Embed tampilkan:
+Dropdown Category
+🏠 Home
+❌ Close
+DROPDOWN CATEGORY
+Saat user memilih kategori:
+JANGAN mengirim Embed baru.
+JANGAN mengirim pesan baru.
+Bot WAJIB mengedit (edit/update) Embed Help Center yang sama.
+Contoh:
+Help Center
+↓
+Moderation
+↓
+Help Center berubah menjadi Moderation Guide.
+↓
+Take Role
+↓
+Embed yang sama berubah menjadi Take Role Guide.
+↓
+Welcome
+↓
+Embed yang sama berubah menjadi Welcome Guide.
+Seluruh navigasi menggunakan satu Embed yang sama.
+HOME BUTTON
+Saat tombol 🏠 Home ditekan:
+Embed kembali menjadi halaman utama Help Center.
+Tidak membuat pesan baru.
+CLOSE BUTTON
+Saat tombol ❌ Close ditekan:
+Nonaktifkan seluruh Button dan Dropdown.
+Atau hapus pesan Help Center.
+Gunakan metode yang paling sesuai dengan UI yang sudah ada.
+DOKUMENTASI
+Setiap kategori hanya menampilkan dokumentasi singkat.
+Contoh Moderation:
+📖 Moderation Commands
+
+🧹 !cc <jumlah>
+
+🔨 !ban <user> [reason]
+
+👢 !kick <user> [reason]
+
+🔇 !mute <user> <durasi> [reason]
+
+🔊 !unmute <user>
+
+🔓 !unban <userID> [reason]
+
+💤 !afk [alasan]
+
+🧵 !autothread <#channel> <on/off>
+
+📋 !listthread
+
+━━━━━━━━━━━━━━━━━━
+
+💡 Tips
+
+• Reply Message didukung.
+
+• < > = Wajib
+
+• [ ] = Opsional
+Kategori lain cukup menampilkan ringkasan fitur dan cara penggunaan singkat.
+AUTO UPDATE
+Help Center harus membaca fitur yang sudah tersedia.
+Jika suatu fitur belum diimplementasikan, jangan tampilkan pada Help Center.
+Jika nanti fitur baru ditambahkan (Logs, Backup, Giveaway, Ticket Center, dll.), Help Center harus dapat menampilkannya tanpa mengubah konsep UI.
+KOMPATIBILITAS
+Help System harus kompatibel dengan:
+Shared Core
+Shared Setup Engine
+Shared Config
+Shared Storage
+Auto Recovery
+Permission System
+Jangan mengubah arsitektur project.
+Jangan membuat sistem dokumentasi terpisah.
+Gunakan satu Embed yang terus diperbarui (edit message) agar UI tetap bersih, modern, dan konsisten dengan Setup System.
