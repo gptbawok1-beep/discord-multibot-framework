@@ -94,5 +94,22 @@ if (process.platform !== 'win32') {
 
 logger.info('Starting Discord Multi-Bot Framework...');
 
-spawnBot('BOT1', join(__dirname, 'bots', 'bot1', 'index.js'));
-spawnBot('BOT2', join(__dirname, 'bots', 'bot2', 'index.js'));
+// Import config to check which bots have tokens configured
+const { default: config } = await import('./shared/config/index.js');
+
+if (config.bot1) {
+  spawnBot('BOT1', join(__dirname, 'bots', 'bot1', 'index.js'));
+} else {
+  logger.warn('BOT1_TOKEN or BOT1_CLIENT_ID not set — skipping BOT 1.');
+}
+
+if (config.bot2) {
+  spawnBot('BOT2', join(__dirname, 'bots', 'bot2', 'index.js'));
+} else {
+  logger.warn('BOT2_TOKEN or BOT2_CLIENT_ID not set — skipping BOT 2.');
+}
+
+if (children.length === 0) {
+  logger.error('No bots configured. Set at least BOT1_TOKEN and BOT1_CLIENT_ID.');
+  process.exit(1);
+}
