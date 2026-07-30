@@ -1,40 +1,57 @@
 /**
- * Bot 1 — Setup Wizard Plugin Registry
+ * Bot 1 — Setup Wizard Plugin Auto-Loader
  *
- * To add a new plugin:
- *   1. Create bots/bot1/setup/plugins/myFeature.js
- *   2. Import it here and add it to PLUGINS array
- *   That's it — no other files need to change.
+ * Automatically discovers and loads all plugin files in this directory.
+ * To add a new plugin: create bots/bot1/setup/plugins/myFeature.js
+ * No other files need to change — it will be picked up on next start.
  *
  * Plugin interface:
- *   id          {string}    Unique kebab-case ID
- *   label       {string}    Human-readable name shown in dropdown
- *   emoji       {string}    Emoji prefix
- *   description {string}    Short description for dropdown tooltip
+ *   id                  {string}    Unique kebab-case ID
+ *   label               {string}    Human-readable name shown in dropdown
+ *   emoji               {string}    Emoji prefix
+ *   description         {string}    Short description for dropdown tooltip
+ *   order               {number}    Sort order in dropdown (lower = first)
+ *   requiredPermission  {bigint?}   PermissionFlagsBits value required to access this plugin
  *   getStatus   (guildConfig) => { enabled: boolean, summary: string }
  *   buildPage   (guildConfig, session) => Promise<{ embed, components }>
  *   handleInteraction (interaction, session, guildConfig, action) => Promise<void>
  *   handleModal? (interaction, session, guildConfig, field) => Promise<void>
+ *   onRecover?  (guild, guildConfig) => Promise<void>  — called on bot startup
  */
 
-import serverPlugin from './server.js';
-import welcomePlugin from './welcome.js';
-import takeRolePlugin from './takeRole.js';
-import invitePlugin from './invite.js';
-import channelManagerPlugin from './channelManager.js';
-import logsPlugin from './logs.js';
-import backupPlugin from './backup.js';
+import { readdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-/** @type {Plugin[]} Ordered list — this is the order shown in the dropdown */
-const PLUGINS = [
-  serverPlugin,
-  welcomePlugin,
-  takeRolePlugin,
-  invitePlugin,
-  channelManagerPlugin,
-  logsPlugin,
-  backupPlugin,
-];
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Discover all .js plugin files in this directory (excluding index.js)
+const pluginFiles = readdirSync(__dirname).filter(
+  (f) => f.endsWith('.js') && f !== 'index.js'
+);
+
+// Dynamically import each plugin file; failures are isolated so one broken
+// plugin doesn't prevent the rest from loading.
+const loadResults = await Promise.allSettled(
+  pluginFiles.map((file) => import(`./${file}`).then((m) => m.default))
+);
+
+/** @type {Plugin[]} */
+const PLUGINS = loadResults
+  .map((result, i) => {
+    if (result.status === 'rejected') {
+      console.warn(`[PluginLoader] Failed to load plugin "${pluginFiles[i]}": ${result.reason}`);
+      return null;
+    }
+    const plugin = result.value;
+    if (!plugin?.id || typeof plugin.buildPage !== 'function') {
+      console.warn(`[PluginLoader] Skipping invalid plugin in "${pluginFiles[i]}"`);
+      return null;
+    }
+    return plugin;
+  })
+  .filter(Boolean)
+  .sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
 /** @type {Map<string, Plugin>} */
 const PLUGIN_MAP = new Map(PLUGINS.map((p) => [p.id, p]));

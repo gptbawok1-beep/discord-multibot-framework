@@ -8,8 +8,9 @@
  *   main → step:channel → step:mode → step:roles → step:options → main
  *
  * NOTE: This wizard only configures panels and saves them to config.
- * Deploying the panel to a channel (posting the actual message with
- * components) is a future implementation step.
+ * Deploying the panel to a channel is a future implementation step.
+ *
+ * Required permission: Manage Roles
  */
 
 import {
@@ -20,31 +21,29 @@ import {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
+  PermissionFlagsBits,
 } from 'discord.js';
 import {
   Colors, DIVIDER, statusDot, channelLabel,
   buildNavRow, buildChannelSelectPage, buildRoleSelectPage,
 } from '../ui.js';
 import { updateSection, loadGuildConfig } from '../config.js';
+import { validateRoles, buildValidationErrorEmbed } from '../../../../shared/setup/validation.js';
 
-// Helpers
+// Draft helpers
 const draftKey = 'takeRoleDraft';
-
-function getDraft(session) {
-  return session.wizardData[draftKey] ?? {};
-}
-
-function setDraft(session, data) {
+const getDraft = (session) => session.wizardData[draftKey] ?? {};
+const setDraft = (session, data) => {
   session.wizardData[draftKey] = { ...getDraft(session), ...data };
-}
-
-// ---------------------------------------------------------------------------
+};
 
 const plugin = {
-  id: 'takerole',
-  label: 'Take Role',
-  emoji: '🎭',
-  description: 'Konfigurasi panel untuk user mengambil role sendiri.',
+  id:                 'takerole',
+  label:              'Take Role',
+  emoji:              '🎭',
+  description:        'Konfigurasi panel untuk user mengambil role sendiri.',
+  order:              2,
+  requiredPermission: PermissionFlagsBits.ManageRoles,
 
   getStatus(cfg) {
     const count = cfg.takeRole.panels?.length ?? 0;
@@ -56,13 +55,13 @@ const plugin = {
 
   async buildPage(cfg, session) {
     const panels = cfg.takeRole.panels ?? [];
-    const embed = new EmbedBuilder()
+    const embed  = new EmbedBuilder()
       .setColor(cfg.takeRole.enabled ? Colors.SUCCESS : Colors.NEUTRAL)
       .setAuthor({ name: '🎭  Take Role' })
       .setDescription(`Konfigurasi panel Take Role untuk server ini.\n${DIVIDER}`)
       .addFields(
         { name: '📊  Status', value: statusDot(cfg.takeRole.enabled), inline: true },
-        { name: '📋  Panel',  value: `${panels.length} panel`, inline: true },
+        { name: '📋  Panel',  value: `${panels.length} panel`,         inline: true },
       )
       .setFooter({ text: 'Buat panel baru atau kelola panel yang sudah ada.' });
 
@@ -76,36 +75,30 @@ const plugin = {
     const row1 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:takerole:enable')
-        .setLabel('Enable')
-        .setEmoji('🟢')
-        .setStyle(ButtonStyle.Success)
+        .setLabel('Enable').setEmoji('🟢').setStyle(ButtonStyle.Success)
         .setDisabled(cfg.takeRole.enabled),
       new ButtonBuilder()
         .setCustomId('setup1:takerole:disable')
-        .setLabel('Disable')
-        .setEmoji('🔴')
-        .setStyle(ButtonStyle.Danger)
+        .setLabel('Disable').setEmoji('🔴').setStyle(ButtonStyle.Danger)
         .setDisabled(!cfg.takeRole.enabled),
       new ButtonBuilder()
         .setCustomId('setup1:takerole:new_panel')
-        .setLabel('Panel Baru')
-        .setEmoji('➕')
-        .setStyle(ButtonStyle.Primary),
+        .setLabel('Panel Baru').setEmoji('➕').setStyle(ButtonStyle.Primary),
     );
 
     return { embed, components: [row1, buildNavRow()] };
   },
 
   async handleInteraction(interaction, session, cfg, action) {
-    // ── Toggle ─────────────────────────────────────────────────────────────
+    // ── Toggle ───────────────────────────────────────────────────────────
     if (action === 'enable' || action === 'disable') {
       await updateSection(session.guildId, 'takeRole', { enabled: action === 'enable' });
       const fresh = await loadGuildConfig(session.guildId);
-      const page = await plugin.buildPage(fresh, session);
+      const page  = await plugin.buildPage(fresh, session);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
-    // ── Step 1: Choose channel ─────────────────────────────────────────────
+    // ── Step 1: Choose channel ────────────────────────────────────────────
     if (action === 'new_panel') {
       setDraft(session, { step: 'channel', channelId: null, mode: null, roles: [] });
       const page = buildChannelSelectPage(
@@ -122,7 +115,7 @@ const plugin = {
       return showModeStep(interaction, session);
     }
 
-    // ── Step 2: Choose mode ────────────────────────────────────────────────
+    // ── Step 2: Choose mode ───────────────────────────────────────────────
     if (action === 'mode_dropdown' || action === 'mode_button') {
       setDraft(session, { mode: action === 'mode_dropdown' ? 'dropdown' : 'button', step: 'roles' });
       const page = buildRoleSelectPage(
@@ -137,10 +130,10 @@ const plugin = {
 
     if (action === 'role_select') {
       setDraft(session, { roles: interaction.values.map((id) => ({ roleId: id })), step: 'options' });
-      return showOptionsStep(interaction, session, cfg);
+      return showOptionsStep(interaction, session);
     }
 
-    // ── Step 4: Options modal ──────────────────────────────────────────────
+    // ── Step 4: Options modal ─────────────────────────────────────────────
     if (action === 'set_options') {
       const draft = getDraft(session);
       const modal = new ModalBuilder()
@@ -148,74 +141,72 @@ const plugin = {
         .setTitle('Take Role — Langkah 4/4: Opsi');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('placeholder')
-            .setLabel('Placeholder Dropdown (opsional)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(draft.placeholder ?? 'Pilih role...')
-            .setMaxLength(100)
-            .setRequired(false),
+          new TextInputBuilder().setCustomId('placeholder').setLabel('Placeholder Dropdown (opsional)')
+            .setStyle(TextInputStyle.Short).setValue(draft.placeholder ?? 'Pilih role...')
+            .setMaxLength(100).setRequired(false),
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('maxRoles')
-            .setLabel('Maks. Role per User (1-25)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(String(draft.maxRoles ?? 1))
-            .setMaxLength(2)
-            .setRequired(true),
+          new TextInputBuilder().setCustomId('maxRoles').setLabel('Maks. Role per User (1-25)')
+            .setStyle(TextInputStyle.Short).setValue(String(draft.maxRoles ?? 1))
+            .setMaxLength(2).setRequired(true),
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('single')
-            .setLabel('Single Role? (ya/tidak)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(draft.single === false ? 'tidak' : 'ya')
-            .setMaxLength(5)
-            .setRequired(true),
+          new TextInputBuilder().setCustomId('single').setLabel('Single Role? (ya/tidak)')
+            .setStyle(TextInputStyle.Short).setValue(draft.single === false ? 'tidak' : 'ya')
+            .setMaxLength(5).setRequired(true),
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('toggle')
-            .setLabel('Toggle Mode — klik lagi hapus role? (ya/tidak)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(draft.toggle ? 'ya' : 'tidak')
-            .setMaxLength(5)
-            .setRequired(true),
+          new TextInputBuilder().setCustomId('toggle').setLabel('Toggle Mode — klik lagi hapus role? (ya/tidak)')
+            .setStyle(TextInputStyle.Short).setValue(draft.toggle ? 'ya' : 'tidak')
+            .setMaxLength(5).setRequired(true),
         ),
       );
       return interaction.showModal(modal);
     }
 
-    // ── Confirm save ───────────────────────────────────────────────────────
+    // ── Confirm save ──────────────────────────────────────────────────────
     if (action === 'confirm_panel') {
-      const draft = getDraft(session);
+      const draft   = getDraft(session);
+      const roleIds = (draft.roles ?? []).map((r) => r.roleId).filter(Boolean);
+
+      // Validate all roles before saving
+      if (roleIds.length > 0 && interaction.guild) {
+        const { ok, reasons } = await validateRoles(interaction.guild, roleIds);
+        if (!ok) {
+          return interaction.update({
+            embeds:     [buildValidationErrorEmbed(reasons)],
+            components: [buildNavRow()],
+          });
+        }
+      }
+
       const panels = [...(cfg.takeRole.panels ?? [])];
       panels.push({
-        id: Date.now().toString(36),
-        channelId: draft.channelId,
-        messageId: null, // set when panel is deployed
-        mode: draft.mode,
+        id:          Date.now().toString(36),
+        channelId:   draft.channelId,
+        messageId:   null,
+        mode:        draft.mode,
         placeholder: draft.placeholder ?? 'Pilih role...',
-        maxRoles: draft.maxRoles ?? 1,
-        single: draft.single ?? true,
-        toggle: draft.toggle ?? false,
-        roles: (draft.roles ?? []).map((r) => ({
-          roleId: r.roleId,
-          name: r.name ?? null,
-          emoji: r.emoji ?? null,
+        maxRoles:    draft.maxRoles ?? 1,
+        single:      draft.single ?? true,
+        toggle:      draft.toggle ?? false,
+        roles:       (draft.roles ?? []).map((r) => ({
+          roleId:      r.roleId,
+          name:        r.name ?? null,
+          emoji:       r.emoji ?? null,
           description: r.description ?? null,
         })),
       });
+
       await updateSection(session.guildId, 'takeRole', { panels, enabled: true });
       session.wizardData = {};
       const fresh = await loadGuildConfig(session.guildId);
-      const page = await plugin.buildPage(fresh, session);
+      const page  = await plugin.buildPage(fresh, session);
       page.embed.setDescription(`✅  Panel berhasil disimpan!\n\n${page.embed.data.description}`);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
-    // ── Back navigations ───────────────────────────────────────────────────
+    // ── Back navigations ──────────────────────────────────────────────────
     if (action === 'back_to_main') {
       session.wizardData = {};
       const page = await plugin.buildPage(cfg, session);
@@ -229,18 +220,13 @@ const plugin = {
 
   async handleModal(interaction, session, cfg, field) {
     if (field === 'options') {
-      const placeholder = interaction.fields.getTextInputValue('placeholder').trim();
-      const maxRolesRaw = parseInt(interaction.fields.getTextInputValue('maxRoles'), 10);
-      const maxRoles = isNaN(maxRolesRaw) ? 1 : Math.min(25, Math.max(1, maxRolesRaw));
-      const single = interaction.fields.getTextInputValue('single').toLowerCase().startsWith('y');
-      const toggle = interaction.fields.getTextInputValue('toggle').toLowerCase().startsWith('y');
-
+      const placeholder  = interaction.fields.getTextInputValue('placeholder').trim();
+      const maxRolesRaw  = parseInt(interaction.fields.getTextInputValue('maxRoles'), 10);
+      const maxRoles     = isNaN(maxRolesRaw) ? 1 : Math.min(25, Math.max(1, maxRolesRaw));
+      const single       = interaction.fields.getTextInputValue('single').toLowerCase().startsWith('y');
+      const toggle       = interaction.fields.getTextInputValue('toggle').toLowerCase().startsWith('y');
       setDraft(session, { placeholder, maxRoles, single, toggle, step: 'confirm' });
-
-      await interaction.reply({
-        content: `✅  Opsi disimpan. Kembali ke wizard dan klik **Simpan Panel**.`,
-        ephemeral: true,
-      });
+      await interaction.reply({ content: `✅  Opsi disimpan. Kembali ke wizard dan klik **Simpan Panel**.`, ephemeral: true });
     }
   },
 };
@@ -260,25 +246,15 @@ async function showModeStep(interaction, session) {
     );
 
   const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('setup1:takerole:mode_dropdown')
-      .setLabel('📋 Dropdown Mode')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId('setup1:takerole:mode_button')
-      .setLabel('🔘 Button Mode')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId('setup1:takerole:back_to_main')
-      .setLabel('Back')
-      .setEmoji('◀️')
-      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('setup1:takerole:mode_dropdown').setLabel('📋 Dropdown Mode').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('setup1:takerole:mode_button').setLabel('🔘 Button Mode').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('setup1:takerole:back_to_main').setLabel('Back').setEmoji('◀️').setStyle(ButtonStyle.Secondary),
   );
 
   return interaction.update({ embeds: [embed], components: [row] });
 }
 
-async function showOptionsStep(interaction, session, cfg) {
+async function showOptionsStep(interaction, session) {
   const draft = getDraft(session);
   const embed = new EmbedBuilder()
     .setColor(Colors.DARK)
@@ -291,21 +267,9 @@ async function showOptionsStep(interaction, session, cfg) {
     );
 
   const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('setup1:takerole:set_options')
-      .setLabel('Atur Opsi...')
-      .setEmoji('⚙️')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId('setup1:takerole:confirm_panel')
-      .setLabel('Simpan Panel')
-      .setEmoji('💾')
-      .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-      .setCustomId('setup1:takerole:back_to_main')
-      .setLabel('Batal')
-      .setEmoji('✖️')
-      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId('setup1:takerole:set_options').setLabel('Atur Opsi...').setEmoji('⚙️').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('setup1:takerole:confirm_panel').setLabel('Simpan Panel').setEmoji('💾').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('setup1:takerole:back_to_main').setLabel('Batal').setEmoji('✖️').setStyle(ButtonStyle.Danger),
   );
 
   return interaction.update({ embeds: [embed], components: [row] });

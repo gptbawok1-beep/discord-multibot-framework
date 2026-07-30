@@ -4,6 +4,8 @@
  * Setup wizard for configuring welcome and goodbye messages.
  * The actual sending of welcome messages is NOT implemented here
  * (foundation only — ready to be connected in a future phase).
+ *
+ * Required permission: Manage Guild
  */
 
 import {
@@ -14,18 +16,22 @@ import {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
+  PermissionFlagsBits,
 } from 'discord.js';
 import {
   Colors, DIVIDER, statusDot, channelLabel,
   buildNavRow, buildChannelSelectPage, buildChannelPreviewPage,
 } from '../ui.js';
 import { updateSection, loadGuildConfig } from '../config.js';
+import { validateTextChannel, buildValidationErrorEmbed } from '../../../../shared/setup/validation.js';
 
 const plugin = {
-  id: 'welcome',
-  label: 'Welcome & Goodbye',
-  emoji: '👋',
-  description: 'Pesan sambutan dan perpisahan anggota baru.',
+  id:                 'welcome',
+  label:              'Welcome & Goodbye',
+  emoji:              '👋',
+  description:        'Pesan sambutan dan perpisahan anggota baru.',
+  order:              1,
+  requiredPermission: PermissionFlagsBits.ManageGuild,
 
   getStatus(cfg) {
     return {
@@ -41,86 +47,61 @@ const plugin = {
       .setAuthor({ name: '👋  Welcome & Goodbye' })
       .setDescription(`Konfigurasi pesan selamat datang dan selamat tinggal.\n${DIVIDER}`)
       .addFields(
-        { name: '📊  Status',   value: statusDot(w.enabled),           inline: true },
-        { name: '📢  Channel',  value: channelLabel(w.channelId),       inline: true },
-        { name: '🎨  Color',    value: w.embed.color ?? '#5865F2',       inline: true },
-        { name: '📝  Judul',    value: w.embed.title || '*Belum diatur*', inline: true },
-        { name: '🖼️  Image',    value: w.image ? '`Tersimpan`' : '`Belum diatur`', inline: true },
-        { name: '🎞️  GIF',      value: w.gif   ? '`Tersimpan`' : '`Belum diatur`', inline: true },
+        { name: '📊  Status',  value: statusDot(w.enabled),              inline: true },
+        { name: '📢  Channel', value: channelLabel(w.channelId),          inline: true },
+        { name: '🎨  Color',   value: w.embed.color ?? '#5865F2',          inline: true },
+        { name: '📝  Judul',   value: w.embed.title || '*Belum diatur*',   inline: true },
+        { name: '🖼️  Image',   value: w.image ? '`Tersimpan`' : '`Belum diatur`', inline: true },
+        { name: '🎞️  GIF',     value: w.gif   ? '`Tersimpan`' : '`Belum diatur`', inline: true },
       )
       .setFooter({ text: 'Gunakan tombol di bawah untuk konfigurasi.' });
 
     const row1 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:welcome:enable')
-        .setLabel('Enable')
-        .setEmoji('🟢')
-        .setStyle(ButtonStyle.Success)
+        .setLabel('Enable').setEmoji('🟢').setStyle(ButtonStyle.Success)
         .setDisabled(w.enabled),
       new ButtonBuilder()
         .setCustomId('setup1:welcome:disable')
-        .setLabel('Disable')
-        .setEmoji('🔴')
-        .setStyle(ButtonStyle.Danger)
+        .setLabel('Disable').setEmoji('🔴').setStyle(ButtonStyle.Danger)
         .setDisabled(!w.enabled),
       new ButtonBuilder()
         .setCustomId('setup1:welcome:set_channel')
-        .setLabel('Set Channel')
-        .setEmoji('📢')
-        .setStyle(ButtonStyle.Primary),
+        .setLabel('Set Channel').setEmoji('📢').setStyle(ButtonStyle.Primary),
     );
 
     const row2 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:welcome:set_embed')
-        .setLabel('Set Embed')
-        .setEmoji('📝')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Set Embed').setEmoji('📝').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:welcome:set_color')
-        .setLabel('Set Color')
-        .setEmoji('🎨')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Set Color').setEmoji('🎨').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:welcome:set_image')
-        .setLabel('Set Image URL')
-        .setEmoji('🖼️')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Set Image URL').setEmoji('🖼️').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:welcome:set_gif')
-        .setLabel('Set GIF URL')
-        .setEmoji('🎞️')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Set GIF URL').setEmoji('🎞️').setStyle(ButtonStyle.Secondary),
     );
 
     const row3 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:welcome:preview')
-        .setLabel('Preview')
-        .setEmoji('👁️')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Preview').setEmoji('👁️').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:welcome:test')
-        .setLabel('Test')
-        .setEmoji('🔬')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Test').setEmoji('🔬').setStyle(ButtonStyle.Secondary),
     );
 
     return { embed, components: [row1, row2, row3, buildNavRow()] };
   },
 
   async handleInteraction(interaction, session, cfg, action) {
-    if (action === 'enable') {
-      await updateSection(session.guildId, 'welcome', { enabled: true });
+    if (action === 'enable' || action === 'disable') {
+      await updateSection(session.guildId, 'welcome', { enabled: action === 'enable' });
       const fresh = await loadGuildConfig(session.guildId);
-      const page = await plugin.buildPage(fresh);
-      return interaction.update({ embeds: [page.embed], components: page.components });
-    }
-
-    if (action === 'disable') {
-      await updateSection(session.guildId, 'welcome', { enabled: false });
-      const fresh = await loadGuildConfig(session.guildId);
-      const page = await plugin.buildPage(fresh);
+      const page  = await plugin.buildPage(fresh);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
@@ -135,7 +116,6 @@ const plugin = {
     }
 
     if (action === 'ch_select') {
-      // Stage the selected channel — don't save yet; show preview first
       session.wizardData.pendingChannel = interaction.values[0];
       const page = buildChannelPreviewPage(
         '📢  Welcome Channel — Preview',
@@ -148,19 +128,25 @@ const plugin = {
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
-    // User confirmed the channel selection → now save to config
     if (action === 'ch_confirm') {
       const channelId = session.wizardData.pendingChannel;
       if (channelId) {
+        // Validate channel before saving
+        const validation = await validateTextChannel(interaction.guild, channelId);
+        if (!validation.ok) {
+          return interaction.update({
+            embeds:     [buildValidationErrorEmbed([validation.reason])],
+            components: [buildNavRow()],
+          });
+        }
         await updateSection(session.guildId, 'welcome', { channelId });
         delete session.wizardData.pendingChannel;
       }
       const fresh = await loadGuildConfig(session.guildId);
-      const page = await plugin.buildPage(fresh);
+      const page  = await plugin.buildPage(fresh);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
-    // User wants to re-pick the channel
     if (action === 'ch_retry') {
       delete session.wizardData.pendingChannel;
       const page = buildChannelSelectPage(
@@ -184,22 +170,14 @@ const plugin = {
         .setTitle('Set Welcome Embed');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('title')
-            .setLabel('Judul Embed')
-            .setStyle(TextInputStyle.Short)
-            .setValue(cfg.welcome.embed.title ?? '')
-            .setMaxLength(256)
-            .setRequired(false),
+          new TextInputBuilder().setCustomId('title').setLabel('Judul Embed')
+            .setStyle(TextInputStyle.Short).setValue(cfg.welcome.embed.title ?? '')
+            .setMaxLength(256).setRequired(false),
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('description')
-            .setLabel('Deskripsi Embed')
-            .setStyle(TextInputStyle.Paragraph)
-            .setValue(cfg.welcome.embed.description ?? '')
-            .setMaxLength(1024)
-            .setRequired(false),
+          new TextInputBuilder().setCustomId('description').setLabel('Deskripsi Embed')
+            .setStyle(TextInputStyle.Paragraph).setValue(cfg.welcome.embed.description ?? '')
+            .setMaxLength(1024).setRequired(false),
         ),
       );
       return interaction.showModal(modal);
@@ -211,14 +189,9 @@ const plugin = {
         .setTitle('Set Embed Color');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('color')
-            .setLabel('Warna Hex (contoh: #5865F2)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(cfg.welcome.embed.color ?? '#5865F2')
-            .setMinLength(4)
-            .setMaxLength(7)
-            .setRequired(true),
+          new TextInputBuilder().setCustomId('color').setLabel('Warna Hex (contoh: #5865F2)')
+            .setStyle(TextInputStyle.Short).setValue(cfg.welcome.embed.color ?? '#5865F2')
+            .setMinLength(4).setMaxLength(7).setRequired(true),
         ),
       );
       return interaction.showModal(modal);
@@ -230,12 +203,8 @@ const plugin = {
         .setTitle('Set Welcome Image');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('url')
-            .setLabel('URL Gambar (kosongkan untuk hapus)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(cfg.welcome.image ?? '')
-            .setRequired(false),
+          new TextInputBuilder().setCustomId('url').setLabel('URL Gambar (kosongkan untuk hapus)')
+            .setStyle(TextInputStyle.Short).setValue(cfg.welcome.image ?? '').setRequired(false),
         ),
       );
       return interaction.showModal(modal);
@@ -247,12 +216,8 @@ const plugin = {
         .setTitle('Set Welcome GIF');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder()
-            .setCustomId('url')
-            .setLabel('URL GIF (kosongkan untuk hapus)')
-            .setStyle(TextInputStyle.Short)
-            .setValue(cfg.welcome.gif ?? '')
-            .setRequired(false),
+          new TextInputBuilder().setCustomId('url').setLabel('URL GIF (kosongkan untuk hapus)')
+            .setStyle(TextInputStyle.Short).setValue(cfg.welcome.gif ?? '').setRequired(false),
         ),
       );
       return interaction.showModal(modal);
@@ -266,7 +231,6 @@ const plugin = {
         .setDescription(w.embed.description || 'Tidak ada deskripsi.')
         .setFooter({ text: 'Preview — bukan kiriman nyata' });
       if (w.image) previewEmbed.setImage(w.image);
-
       return interaction.reply({ embeds: [previewEmbed], ephemeral: true });
     }
 
@@ -286,16 +250,12 @@ const plugin = {
 
   async handleModal(interaction, session, cfg, field) {
     if (field === 'embed') {
-      const title = interaction.fields.getTextInputValue('title');
+      const title       = interaction.fields.getTextInputValue('title');
       const description = interaction.fields.getTextInputValue('description');
-      await updateSection(session.guildId, 'welcome', {
-        embed: { ...cfg.welcome.embed, title, description },
-      });
+      await updateSection(session.guildId, 'welcome', { embed: { ...cfg.welcome.embed, title, description } });
     } else if (field === 'color') {
       const color = interaction.fields.getTextInputValue('color').trim();
-      await updateSection(session.guildId, 'welcome', {
-        embed: { ...cfg.welcome.embed, color },
-      });
+      await updateSection(session.guildId, 'welcome', { embed: { ...cfg.welcome.embed, color } });
     } else if (field === 'image') {
       const url = interaction.fields.getTextInputValue('url').trim() || null;
       await updateSection(session.guildId, 'welcome', { image: url });
@@ -303,7 +263,6 @@ const plugin = {
       const url = interaction.fields.getTextInputValue('url').trim() || null;
       await updateSection(session.guildId, 'welcome', { gif: url });
     }
-
     await interaction.reply({ content: '✅  Welcome settings disimpan.', ephemeral: true });
   },
 };

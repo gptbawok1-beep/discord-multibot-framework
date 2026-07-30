@@ -1,45 +1,101 @@
-# [Project name]
+# Discord Multi-Bot Framework
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A scalable Discord Multi-Bot Framework using Node.js 22 LTS, JavaScript ESM, and discord.js v14. Supports 2 independent Discord bots sharing one core infrastructure, with a full **Setup Wizard** system for BOT 1.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+```bash
+# Install dependencies
+cd discord-framework && npm install
+
+# Run both bots simultaneously
+cd discord-framework && node index.js
+
+# Run only BOT 1
+cd discord-framework && node bots/bot1/index.js
+
+# Run only BOT 2
+cd discord-framework && node bots/bot2/index.js
+
+# Register slash commands (requires GUILD_ID env var for instant guild deployment)
+cd discord-framework && GUILD_ID=your_guild_id node bots/bot1/deploy-commands.js
+```
+
+## Required Environment Variables
+
+Copy `discord-framework/.env.example` to `discord-framework/.env` and fill in:
+
+| Variable | Description |
+|---|---|
+| `BOT1_TOKEN` | Discord bot token for BOT 1 |
+| `BOT1_CLIENT_ID` | Discord application client ID for BOT 1 |
+| `BOT1_PREFIX` | Prefix for BOT 1 (default: `!`) |
+| `BOT2_TOKEN` | Discord bot token for BOT 2 |
+| `BOT2_CLIENT_ID` | Discord application client ID for BOT 2 |
+| `BOT2_PREFIX` | Prefix for BOT 2 (default: `?`) |
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Node.js 22 LTS, JavaScript ESM, discord.js v14, dotenv
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+```
+discord-framework/
+  bots/
+    bot1/
+      commands/slash/setup.js     — /setup bot1 command
+      events/ready.js             — startup + auto recovery
+      events/interactionCreate.js — routes setup1:* interactions
+      setup/
+        index.js                  — BOT 1 engine instance (entry point for setup)
+        config.js                 — guild config manager (persistent JSON)
+        ui.js                     — UI builders pre-wired to 'setup1' prefix
+        wizard.js                 — re-exports from index.js (backwards compat)
+        plugins/
+          index.js                — AUTO plugin loader (no manual registry)
+          server.js               — Server Settings plugin
+          welcome.js              — Welcome & Goodbye plugin
+          takeRole.js             — Take Role wizard plugin
+          invite.js               — Invite Tracker plugin
+          channelManager.js       — Channel Manager plugin
+          logs.js                 — Logs plugin
+          backup.js               — Backup plugin (with config backup/restore)
+      data/guilds/                — persistent guild config JSON files
+                                    guilds/<guildId>.json
+                                    guilds/backups/<guildId>/<timestamp>.json
+  shared/
+    setup/                        — SHARED SETUP ENGINE (reusable by any bot)
+      index.js                    — public exports
+      engine.js                   — createSetupEngine() factory
+      config.js                   — createConfigManager() factory
+      ui.js                       — createUIBuilders(prefix) factory
+      wizard.js                   — createWizard() factory
+      validation.js               — validateTextChannel, validateRole, etc.
+      migration.js                — config schema migration
+      recovery.js                 — createRecovery() factory (startup sequence)
+```
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **Shared Setup Engine**: `shared/setup/engine.js` exports `createSetupEngine()`. BOT 1 creates its engine in `bots/bot1/setup/index.js`. BOT 2 will create its own in `bots/bot2/setup/index.js` — no engine code duplication.
+- **Auto Plugin Loader**: `bots/bot1/setup/plugins/index.js` uses `readdirSync` + dynamic `import()` with top-level await. Drop a `.js` file in the folder and it loads automatically.
+- **Persistent Config**: Guild configs are JSON files in `bots/bot1/data/guilds/`. They survive restarts, re-deploys, and updates. `deepMerge(defaults, saved)` ensures new keys appear without a reset.
+- **Config Versioning + Migration**: Every config has a `configVersion` field. `shared/setup/migration.js` migrates older schemas on load automatically.
+- **Backup Before Reset**: `resetGuildConfig()` always creates a timestamped backup first. The Backup plugin lets owners restore any previous config.
+- **Permission System**: Each plugin declares `requiredPermission: PermissionFlagsBits.X`. The wizard checks this before showing the plugin page.
+- **Validation Before Save**: Channel and role saves call `validateTextChannel` / `validateRole` from `shared/setup/validation.js` before persisting, showing a clear error if validation fails.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Language: Bahasa Indonesia for UI strings in Discord embeds, English for code comments.
+- Keep existing project structure — don't restructure or migrate to different tooling.
+- Setup Engine must be a reusable Shared Engine so BOT 2 can use it later without rewriting.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Discord tokens go in `discord-framework/.env` (NOT the root `.env`). Never commit real tokens.
+- BOT 1 data dir: `discord-framework/bots/bot1/data/guilds/`. Create this manually or let the bot create it on first save.
+- Plugin `order` field controls dropdown sort order (lower = shown first).
+- The `setup1:` custom ID prefix is what identifies BOT 1's interactions. BOT 2 should use `setup2:`.
+- Top-level `await` is used in `bots/bot1/setup/plugins/index.js` for dynamic imports — valid in ESM modules.

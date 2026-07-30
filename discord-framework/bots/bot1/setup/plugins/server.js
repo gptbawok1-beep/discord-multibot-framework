@@ -3,6 +3,8 @@
  *
  * Configures basic bot behaviour for this server:
  * prefix, language, timezone.
+ *
+ * Required permission: Manage Guild
  */
 
 import {
@@ -13,15 +15,18 @@ import {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
+  PermissionFlagsBits,
 } from 'discord.js';
 import { Colors, DIVIDER, buildNavRow } from '../ui.js';
 import { updateSection } from '../config.js';
 
 const plugin = {
-  id: 'server',
-  label: 'Server',
-  emoji: '🏠',
-  description: 'Prefix, bahasa, dan pengaturan dasar server.',
+  id:                 'server',
+  label:              'Server',
+  emoji:              '🏠',
+  description:        'Prefix, bahasa, dan pengaturan dasar server.',
+  order:              0,
+  requiredPermission: PermissionFlagsBits.ManageGuild,
 
   getStatus(cfg) {
     return {
@@ -67,25 +72,16 @@ const plugin = {
   async handleInteraction(interaction, session, cfg, action) {
     const modals = {
       edit_prefix: {
-        id: 'setup1:modal:server:prefix',
-        title: 'Edit Prefix',
-        label: 'Prefix Baru',
-        value: cfg.server.prefix,
-        min: 1, max: 5,
+        id: 'setup1:modal:server:prefix', title: 'Edit Prefix',
+        label: 'Prefix Baru', value: cfg.server.prefix, min: 1, max: 5,
       },
       edit_lang: {
-        id: 'setup1:modal:server:language',
-        title: 'Edit Bahasa',
-        label: 'Kode Bahasa (contoh: id, en)',
-        value: cfg.server.language,
-        min: 2, max: 5,
+        id: 'setup1:modal:server:language', title: 'Edit Bahasa',
+        label: 'Kode Bahasa (contoh: id, en)', value: cfg.server.language, min: 2, max: 5,
       },
       edit_tz: {
-        id: 'setup1:modal:server:timezone',
-        title: 'Edit Timezone',
-        label: 'Timezone (contoh: Asia/Jakarta)',
-        value: cfg.server.timezone,
-        min: 3, max: 40,
+        id: 'setup1:modal:server:timezone', title: 'Edit Timezone',
+        label: 'Timezone (contoh: Asia/Jakarta)', value: cfg.server.timezone, min: 3, max: 40,
       },
     };
 
@@ -109,7 +105,7 @@ const plugin = {
   },
 
   async handleModal(interaction, session, cfg, field) {
-    const value = interaction.fields.getTextInputValue('value').trim();
+    const value  = interaction.fields.getTextInputValue('value').trim();
     const keyMap = { prefix: 'prefix', language: 'language', timezone: 'timezone' };
     if (keyMap[field]) {
       await updateSection(session.guildId, 'server', { [keyMap[field]]: value });

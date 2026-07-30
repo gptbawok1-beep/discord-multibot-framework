@@ -7,15 +7,15 @@
 
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { BaseCommand } from '../../../../shared/structures/index.js';
-import { openWizard } from '../../setup/wizard.js';
+import { openWizard } from '../../setup/index.js';
 
 export default class SetupCommand extends BaseCommand {
   constructor() {
     super({
-      name: 'setup',
-      description: 'Buka Setup Wizard BOT 1.',
-      type: 'slash',
-      guildOnly: true,
+      name:            'setup',
+      description:     'Buka Setup Wizard BOT 1.',
+      type:            'slash',
+      guildOnly:       true,
       userPermissions: ['ManageGuild'],
       data: new SlashCommandBuilder()
         .setName('setup')

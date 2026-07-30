@@ -11,7 +11,7 @@
 
 import { BaseEvent } from '../../../shared/structures/index.js';
 import { handleSlashCommand } from '../../../shared/handlers/slashHandler.js';
-import { handleInteraction as handleSetupInteraction } from '../setup/wizard.js';
+import { handleInteraction as handleSetupInteraction } from '../setup/index.js';
 import { createLogger } from '../../../shared/logger/index.js';
 
 const logger = createLogger('BOT1');

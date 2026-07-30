@@ -3,6 +3,8 @@
  *
  * Setup wizard for channel management operations.
  * All actions are wizard-only (no execution in this phase).
+ *
+ * Required permission: Manage Channels
  */
 
 import {
@@ -10,14 +12,17 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
+  PermissionFlagsBits,
 } from 'discord.js';
 import { Colors, DIVIDER, buildNavRow } from '../ui.js';
 
 const plugin = {
-  id: 'channelmanager',
-  label: 'Channel Manager',
-  emoji: '📁',
-  description: 'Backup, restore, clone, dan kelola struktur channel.',
+  id:                 'channelmanager',
+  label:              'Channel Manager',
+  emoji:              '📁',
+  description:        'Backup, restore, clone, dan kelola struktur channel.',
+  order:              4,
+  requiredPermission: PermissionFlagsBits.ManageChannels,
 
   getStatus(cfg) {
     const count = cfg.channelManager.backups?.length ?? 0;
@@ -41,55 +46,41 @@ const plugin = {
     const row1 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:backup')
-        .setLabel('Backup Channels')
-        .setEmoji('💾')
-        .setStyle(ButtonStyle.Primary),
+        .setLabel('Backup Channels').setEmoji('💾').setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:restore')
-        .setLabel('Restore')
-        .setEmoji('♻️')
-        .setStyle(ButtonStyle.Primary)
+        .setLabel('Restore').setEmoji('♻️').setStyle(ButtonStyle.Primary)
         .setDisabled(backupCount === 0),
     );
 
     const row2 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:generate')
-        .setLabel('Generate Structure')
-        .setEmoji('🏗️')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Generate Structure').setEmoji('🏗️').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:clone')
-        .setLabel('Clone')
-        .setEmoji('📋')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Clone').setEmoji('📋').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:rename')
-        .setLabel('Rename')
-        .setEmoji('✏️')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Rename').setEmoji('✏️').setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:delete')
-        .setLabel('Delete')
-        .setEmoji('🗑️')
-        .setStyle(ButtonStyle.Danger),
+        .setLabel('Delete').setEmoji('🗑️').setStyle(ButtonStyle.Danger),
     );
 
     const row3 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('setup1:channelmanager:preview')
-        .setLabel('Preview Structure')
-        .setEmoji('👁️')
-        .setStyle(ButtonStyle.Secondary),
+        .setLabel('Preview Structure').setEmoji('👁️').setStyle(ButtonStyle.Secondary),
     );
 
     return { embed, components: [row1, row2, row3, buildNavRow()] };
   },
 
   async handleInteraction(interaction, session, cfg, action) {
-    const comingSoon = async (label) =>
+    const comingSoon = (label) =>
       interaction.reply({
-        content: `⚙️  **${label}** akan tersedia pada fase implementasi berikutnya.`,
+        content:  `⚙️  **${label}** akan tersedia pada fase implementasi berikutnya.`,
         ephemeral: true,
       });
 
