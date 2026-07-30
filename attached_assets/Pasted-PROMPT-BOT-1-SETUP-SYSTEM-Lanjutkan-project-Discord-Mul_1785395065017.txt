@@ -1,0 +1,406 @@
+PROMPT — BOT 1 SETUP SYSTEM
+
+Lanjutkan project Discord Multi Bot Framework yang sudah dibuat.
+
+JANGAN mengubah struktur project.
+
+JANGAN mengubah Core Framework.
+
+JANGAN mengubah Handler.
+
+JANGAN mengubah Shared System.
+
+Fokus hanya membuat Setup System untuk BOT 1.
+
+---
+
+Tujuan
+
+BOT 1 harus memiliki satu command utama:
+
+/setup bot1
+
+Command ini menjadi pusat seluruh konfigurasi BOT 1.
+
+Semua fitur BOT 1 nantinya wajib menggunakan Setup System ini.
+
+Jangan membuat command setup lain.
+
+Semua konfigurasi dilakukan melalui Setup Wizard.
+
+---
+
+UI
+
+Gunakan Discord Components.
+
+WAJIB menggunakan:
+
+- Embed
+- Dropdown
+- Button
+- Modal
+
+Jangan menggunakan command panjang.
+
+Jangan meminta user mengedit file.
+
+Semua dilakukan melalui UI Discord.
+
+---
+
+Tampilan
+
+Saat user menjalankan
+
+/setup bot1
+
+Tampilkan Embed modern.
+
+Isi:
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+BOT 1 SETUP
+
+Selamat datang di Setup Wizard.
+
+Pilih fitur yang ingin dikonfigurasi.
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Dropdown Menu
+
+- 🏠 Server
+- 👋 Welcome & Goodbye
+- 🎭 Take Role
+- 📨 Invite Tracker
+- 📁 Channel Manager
+- 📜 Logs
+- 💾 Backup
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Button
+
+Home
+
+Refresh
+
+Save
+
+Reset
+
+---
+
+Navigasi
+
+Semua menu harus mempunyai:
+
+Back
+
+Home
+
+Refresh
+
+Save
+
+Cancel
+
+Tidak boleh membuat user menjalankan command lagi.
+
+Semua navigasi dilakukan menggunakan Button.
+
+---
+
+Sistem
+
+Semua menu nantinya menjadi plugin.
+
+Artinya Setup Wizard harus bisa menerima menu baru di masa depan tanpa mengubah kode utama.
+
+Gunakan arsitektur modular.
+
+---
+
+TAKE ROLE
+
+JANGAN membuat Reaction Role.
+
+Gunakan sistem Take Role.
+
+Owner memilih:
+
+- Channel
+
+Kemudian memilih mode:
+
+- Dropdown
+
+atau
+
+- Button
+
+Kemudian memilih:
+
+- Role
+
+- Emoji
+
+- Nama
+
+- Deskripsi
+
+- Warna
+
+- Placeholder
+
+- Maksimal Role
+
+- Single Role
+
+- Multiple Role
+
+- Toggle Mode
+
+- Aktif
+
+- Nonaktif
+
+Semua melalui Wizard.
+
+---
+
+User View
+
+Jika mode Dropdown
+
+User melihat:
+
+"Pilih Role"
+
+Dropdown
+
+Saat memilih
+
+Role langsung diberikan.
+
+---
+
+Jika mode Button
+
+User melihat Button.
+
+Klik Button.
+
+Role langsung diberikan.
+
+Jika Toggle aktif
+
+Klik lagi
+
+Role dihapus.
+
+---
+
+Welcome & Goodbye
+
+BELUM membuat sistem Welcome.
+
+Yang dibuat hanya Setup Wizard.
+
+Harus ada menu:
+
+- Enable
+
+- Disable
+
+- Channel
+
+- Embed
+
+- GIF
+
+- Image
+
+- Color
+
+- Preview
+
+- Test
+
+- Save
+
+Belum perlu mengirim Welcome.
+
+---
+
+Invite Tracker
+
+Belum membuat sistem Invite.
+
+Hanya Wizard.
+
+Menu:
+
+Enable
+
+Disable
+
+Channel
+
+Logs
+
+Leaderboard
+
+Preview
+
+Save
+
+---
+
+Channel Manager
+
+Belum membuat fitur.
+
+Hanya Wizard.
+
+Menu:
+
+Backup
+
+Restore
+
+Generate Structure
+
+Clone
+
+Rename
+
+Delete
+
+Preview
+
+Save
+
+---
+
+Logs
+
+Wizard.
+
+Menu:
+
+Member Logs
+
+Role Logs
+
+Invite Logs
+
+Channel Logs
+
+Moderation Logs
+
+Welcome Logs
+
+Error Logs
+
+Save
+
+---
+
+Backup
+
+Wizard.
+
+Menu:
+
+Backup Server
+
+Restore Server
+
+Delete Backup
+
+Preview
+
+Save
+
+---
+
+Penyimpanan
+
+Buat Config Manager.
+
+Semua setting disimpan.
+
+Contoh:
+
+Server
+
+Welcome
+
+TakeRole
+
+Invite
+
+Logs
+
+Backup
+
+ChannelManager
+
+Gunakan struktur yang mudah ditambah.
+
+---
+
+UI Style
+
+Harus modern.
+
+Embed bersih.
+
+Emoji konsisten.
+
+Dropdown rapi.
+
+Button tidak berlebihan.
+
+Warna konsisten.
+
+Tidak terlihat seperti bot Discord biasa.
+
+Harus terasa seperti Control Panel.
+
+---
+
+Coding Style
+
+Gunakan:
+
+- Clean Code
+- SOLID
+- DRY
+- KISS
+- Async/Await
+
+Gunakan JavaScript ESM.
+
+---
+
+Penting
+
+Jangan membuat fitur Welcome.
+
+Jangan membuat Take Role.
+
+Jangan membuat Invite Tracker.
+
+Jangan membuat Backup.
+
+Jangan membuat Logs.
+
+Jangan membuat Channel Manager.
+
+Yang dibuat HANYA Setup Wizard dan seluruh fondasi sistemnya.
+
+Semua fitur di atas hanya berupa halaman konfigurasi (wizard) yang siap dihubungkan ke implementasi pada tahap berikutnya.
