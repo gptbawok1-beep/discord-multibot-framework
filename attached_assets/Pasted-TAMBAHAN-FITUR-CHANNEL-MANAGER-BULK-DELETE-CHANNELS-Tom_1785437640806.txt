@@ -1,0 +1,136 @@
+TAMBAHAN FITUR CHANNEL MANAGER
+BULK DELETE CHANNELS
+Tombol:
+🗑 Delete
+Jangan hanya mendukung penghapusan satu Channel.
+Tambahkan pilihan:
+Delete Selected Channel
+Delete Selected Category
+Delete All Channels
+Delete All Categories
+Delete Entire Server Structure (Category + Channel)
+Semua aksi yang bersifat massal WAJIB memiliki konfirmasi sebanyak dua kali.
+Contoh:
+⚠️ PERINGATAN
+
+Anda akan menghapus:
+
+• 8 Category
+• 42 Text Channel
+• 6 Voice Channel
+
+Total:
+56 Channel
+
+Ketik:
+
+DELETE
+
+untuk melanjutkan.
+Jangan menggunakan satu klik untuk menghapus seluruh struktur server.
+Bot harus menampilkan Preview sebelum proses dijalankan.
+Jika proses berjalan:
+tampilkan Progress
+lanjutkan walaupun ada channel yang gagal dihapus
+tampilkan laporan akhir
+Contoh:
+Delete selesai
+
+Category:
+8/8
+
+Text:
+42/42
+
+Voice:
+6/6
+
+Gagal:
+1
+
+Error:
+Bot tidak memiliki permission pada Voice Channel "Meeting".
+BACKUP MANAGER
+Saat membuat Backup:
+Jangan menggunakan nama otomatis saja.
+Owner HARUS dapat memberikan nama Backup.
+Contoh:
+Nama Backup
+
+Server Awal
+atau
+Backup Event Ramadhan
+atau
+Backup Sebelum Renovasi
+Jika owner tidak mengisi nama:
+Bot menggunakan nama default:
+Backup-2026-07-31-01-30
+RENAME BACKUP
+Tambahkan kemampuan:
+✏ Rename Backup
+Owner dapat mengganti nama Backup kapan saja.
+Gunakan Discord Modal.
+Contoh:
+Backup Lama
+
+↓
+
+Backup Setelah Update
+Tanpa mengubah isi Backup.
+LIST BACKUP
+Saat membuka Backup Manager tampilkan daftar Backup.
+Contoh:
+📦 Backup Tersimpan
+
+1.
+Server Awal
+
+31 Jul 2026
+
+2.
+Backup Event
+
+29 Jul 2026
+
+3.
+Sebelum Renovasi
+
+28 Jul 2026
+Owner dapat memilih Backup melalui Discord String Select Menu.
+DELETE BACKUP
+Owner dapat menghapus Backup tertentu.
+Jangan menghapus seluruh Backup sekaligus kecuali owner memilih "Delete All Backup".
+Semua penghapusan WAJIB memiliki konfirmasi.
+RESTORE BACKUP
+Saat Restore:
+Jangan langsung menerapkan perubahan.
+Tampilkan Preview.
+Contoh:
+Backup:
+
+Server Awal
+
+Isi:
+
+8 Category
+
+43 Text Channel
+
+6 Voice Channel
+
+Dibuat:
+
+31 Jul 2026
+Baru setelah owner menekan Restore, bot mulai memulihkan struktur.
+PERSISTENT STORAGE
+Semua Backup HARUS tetap tersedia setelah:
+Restart Bot
+Restart Hosting
+Restart VPS
+Restart Railway
+Restart Replit
+Restart Pterodactyl
+Deploy ulang
+Update project
+Owner tidak boleh kehilangan Backup.
+Dengan tambahan ini, Channel Manager bukan cuma bisa membuat struktur server, tapi juga menjadi sistem manajemen dan backup struktur server yang lengkap tanpa mengubah UI atau arsitektur yang sudah kamu bangun.

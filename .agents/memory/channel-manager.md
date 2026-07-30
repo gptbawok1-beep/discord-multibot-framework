@@ -3,6 +3,9 @@ name: Channel Manager Plugin Implementation
 description: Notes on the Channel Manager plugin for Bot 1's setup wizard, including modal flow constraints and data storage decisions.
 ---
 
+## Status
+Fully implemented including bulk delete and backup manager (named backups, rename, delete).
+
 ## Plugin location
 `discord-framework/bots/bot1/setup/plugins/channelManager.js`
 
