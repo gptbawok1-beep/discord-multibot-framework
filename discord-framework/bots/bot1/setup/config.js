@@ -86,6 +86,21 @@ export function defaultConfig() {
       enabled: false,
       backups: [],
     },
+    moderation: {
+      enabled:            false,
+      moderatorRoles:     [],   // Role IDs allowed to run mod commands
+      adminRoles:         [],   // Optional elevated roles
+      protectedRoles:     [],   // Roles that cannot be targeted
+      dmNotification:     true, // DM the target on action
+      defaultReason:      'Tidak ada alasan.',
+      confirmationAction: false,
+    },
+    afk: {
+      users: {},   // { [userId]: { reason, timestamp } }
+    },
+    autothread: {
+      channels: [], // Channel IDs with auto-thread enabled
+    },
   };
 }
 

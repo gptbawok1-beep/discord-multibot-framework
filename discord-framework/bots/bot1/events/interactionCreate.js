@@ -14,6 +14,7 @@ import { BaseEvent } from '../../../shared/structures/index.js';
 import { handleSlashCommand } from '../../../shared/handlers/slashHandler.js';
 import { handleInteraction as handleSetupInteraction } from '../setup/index.js';
 import { handlePanelInteraction } from '../features/takeRole/handler.js';
+import { handleHelpInteraction } from '../commands/slash/help.js';
 import { createLogger } from '../../../shared/logger/index.js';
 
 const logger = createLogger('BOT1');
@@ -49,6 +50,16 @@ export default class InteractionCreateEvent extends BaseEvent {
         const handled = await handlePanelInteraction(interaction);
         if (!handled) {
           logger.warn(`Unhandled Take Role panel interaction: ${customId}`);
+        }
+        return;
+      }
+
+      // ── Help command dropdown interactions ────────────────────────────
+      // All Help dropdown custom IDs start with 'bot1help:'
+      if (customId.startsWith('bot1help:')) {
+        const handled = await handleHelpInteraction(interaction);
+        if (!handled) {
+          logger.warn(`Unhandled help interaction: ${customId}`);
         }
         return;
       }
