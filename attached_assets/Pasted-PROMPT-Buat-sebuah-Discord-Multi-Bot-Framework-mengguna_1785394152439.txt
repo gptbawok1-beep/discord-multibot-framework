@@ -1,0 +1,272 @@
+PROMPT
+
+Buat sebuah Discord Multi Bot Framework menggunakan Node.js 22 LTS, JavaScript (ESM), dan discord.js v14.
+
+TUJUAN
+
+Project ini harus mendukung 2 Discord Bot dalam satu project.
+
+Bot menggunakan 2 Token Discord yang berbeda.
+
+Namun kedua bot berbagi:
+
+- Logger
+- Utils
+- Config
+- Services
+- Structures
+- Handler
+
+Semua dibuat satu kali (shared).
+
+Jangan membuat fitur apa pun.
+
+Bot hanya sebagai pondasi.
+
+---
+
+BOT
+
+BOT 1
+
+Token sendiri.
+
+Prefix sendiri.
+
+Slash Command sendiri.
+
+Commands sendiri.
+
+Events sendiri.
+
+Belum memiliki fitur.
+
+Hanya login dan siap dikembangkan.
+
+---
+
+BOT 2
+
+Token sendiri.
+
+Prefix sendiri.
+
+Slash Command sendiri.
+
+Commands sendiri.
+
+Events sendiri.
+
+Belum memiliki fitur.
+
+Hanya login dan siap dikembangkan.
+
+---
+
+Shared Core
+
+Semua sistem berikut digunakan bersama oleh kedua bot.
+
+- Logger
+- Config Loader
+- Command Loader
+- Event Loader
+- Cooldown
+- Permission Checker
+- Embed Helper
+- Dynamic Import
+- Error Handler
+- Utility
+- Services
+- Structures
+
+Tidak boleh membuat dua versi.
+
+Harus digunakan bersama.
+
+---
+
+Struktur Project
+
+WAJIB seperti berikut.
+
+discord-framework/
+
+├── bots/
+│
+│   ├── bot1/
+│   │
+│   │   ├── commands/
+│   │   │   ├── slash/
+│   │   │   └── prefix/
+│   │   │
+│   │   ├── events/
+│   │   │
+│   │   ├── config/
+│   │   │
+│   │   └── index.js
+│   │
+│   └── bot2/
+│       │
+│       ├── commands/
+│       │   ├── slash/
+│       │   └── prefix/
+│       │
+│       ├── events/
+│       │
+│       ├── config/
+│       │
+│       └── index.js
+│
+├── shared/
+│
+│   ├── handlers/
+│
+│   ├── services/
+│
+│   ├── utils/
+│
+│   ├── structures/
+│
+│   ├── logger/
+│
+│   └── config/
+│
+├── assets/
+│
+├── logs/
+│
+├── .env.example
+├── .gitignore
+├── package.json
+├── README.md
+└── LICENSE
+
+Jangan membuat struktur lain.
+
+---
+
+Core
+
+Harus mempunyai:
+
+- Auto Load Commands
+- Auto Load Events
+- Dynamic Import
+- Slash Command Handler
+- Prefix Command Handler
+- Logger
+- Cooldown
+- Permission Checker
+- Error Handler
+- Config Loader
+- Embed Helper
+
+Semuanya berada di folder shared.
+
+---
+
+Commands
+
+Bot1 hanya membaca command miliknya.
+
+Bot2 hanya membaca command miliknya.
+
+Tidak boleh saling membaca command.
+
+---
+
+Events
+
+Bot1 hanya membaca event miliknya.
+
+Bot2 hanya membaca event miliknya.
+
+Tidak boleh saling membaca event.
+
+---
+
+Environment
+
+Gunakan dua token.
+
+Contoh:
+
+BOT1_TOKEN=
+
+BOT2_TOKEN=
+
+BOT1_CLIENT_ID=
+
+BOT2_CLIENT_ID=
+
+Tidak boleh hardcode.
+
+---
+
+Logger
+
+Gunakan logger shared.
+
+Support:
+
+INFO
+
+WARN
+
+ERROR
+
+SUCCESS
+
+DEBUG
+
+Output terminal harus menunjukkan log berasal dari BOT1 atau BOT2.
+
+---
+
+Coding Style
+
+Gunakan:
+
+- Clean Code
+- SOLID
+- DRY
+- KISS
+- Async/Await
+- JavaScript ESM
+
+Jangan menggunakan callback lama.
+
+---
+
+Penting
+
+Jangan membuat fitur apa pun.
+
+Jangan membuat AI.
+
+Jangan membuat Downloader.
+
+Jangan membuat Dashboard.
+
+Jangan membuat Database.
+
+Jangan membuat Moderation.
+
+Jangan membuat Welcome.
+
+Jangan membuat Reaction Role.
+
+Jangan membuat Ticket.
+
+Jangan membuat Music.
+
+Jangan membuat Giveaway.
+
+Jangan membuat Economy.
+
+Jangan membuat sistem server management.
+
+Jangan membuat command selain command contoh sederhana (misalnya ping) untuk memastikan framework bekerja.
+
+Project ini hanya bertujuan membangun pondasi Multi Discord Bot Framework yang siap dikembangkan di masa depan.

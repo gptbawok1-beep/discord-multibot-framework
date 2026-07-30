@@ -1,0 +1,23 @@
+{
+  "name": "discord-multi-bot-framework",
+  "version": "1.0.0",
+  "description": "A Discord Multi-Bot Framework using Node.js 22 LTS, JavaScript ESM, and discord.js v14.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "bot1": "node bots/bot1/index.js",
+    "bot2": "node bots/bot2/index.js",
+    "dev": "node --watch index.js",
+    "register:bot1": "node bots/bot1/deploy-commands.js",
+    "register:bot2": "node bots/bot2/deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {},
+  "license": "MIT"
+}
