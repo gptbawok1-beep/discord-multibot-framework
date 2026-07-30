@@ -232,6 +232,63 @@ export function buildRoleSelectPage(title, description, customId, backId, maxVal
 }
 
 // ---------------------------------------------------------------------------
+// Channel Selection Preview
+// Shown after user picks a channel — lets them confirm before saving.
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a "confirm channel selection" preview page.
+ *
+ * Flow: ChannelSelectMenu → ch_select → this page → ch_confirm (save) or ch_retry (re-pick)
+ *
+ * @param {string} title        - Page title, e.g. '📢  Welcome Channel — Preview'
+ * @param {string} description  - One-line description of what this channel is used for
+ * @param {string} channelId    - The channel ID that was just selected
+ * @param {string} confirmId    - custom_id for the ✅ Simpan button
+ * @param {string} retryId      - custom_id for the 🔄 Pilih Ulang button
+ * @param {string} [cancelId]   - custom_id for the ✖️ Batal button (default: nav:cancel)
+ * @returns {{ embed: EmbedBuilder, components: ActionRowBuilder[] }}
+ */
+export function buildChannelPreviewPage(
+  title,
+  description,
+  channelId,
+  confirmId,
+  retryId,
+  cancelId = 'setup1:nav:cancel',
+) {
+  const embed = new EmbedBuilder()
+    .setColor(Colors.WARNING)
+    .setTitle(title)
+    .setDescription(
+      `**Channel dipilih:** <#${channelId}>\n\n${DIVIDER}\n` +
+      `${description}\n\n` +
+      `Klik **Simpan** untuk konfirmasi, atau **Pilih Ulang** untuk ganti channel.`,
+    )
+    .setFooter({ text: 'Konfigurasi belum disimpan — tekan Simpan untuk mengonfirmasi.' });
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(confirmId)
+      .setLabel('Simpan')
+      .setEmoji('💾')
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId(retryId)
+      .setLabel('Pilih Ulang')
+      .setEmoji('🔄')
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId(cancelId)
+      .setLabel('Batal')
+      .setEmoji('✖️')
+      .setStyle(ButtonStyle.Danger),
+  );
+
+  return { embed, components: [row] };
+}
+
+// ---------------------------------------------------------------------------
 // Feedback / Confirmation
 // ---------------------------------------------------------------------------
 

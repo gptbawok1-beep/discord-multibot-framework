@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import {
   Colors, DIVIDER, statusDot, channelLabel,
-  buildNavRow, buildChannelSelectPage,
+  buildNavRow, buildChannelSelectPage, buildChannelPreviewPage,
 } from '../ui.js';
 import { updateSection, loadGuildConfig } from '../config.js';
 
@@ -97,37 +97,65 @@ const plugin = {
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
+    // Map: button action → channel select page config
     const channelSelectTargets = {
-      set_channel:     { customId: 'setup1:invite:ch_main',        title: 'Set Invite Channel',        desc: 'Pilih channel utama untuk informasi invite.' },
-      set_logs:        { customId: 'setup1:invite:ch_logs',         title: 'Set Logs Channel',          desc: 'Pilih channel untuk log detail invite.' },
-      set_leaderboard: { customId: 'setup1:invite:ch_leaderboard',  title: 'Set Leaderboard Channel',   desc: 'Pilih channel untuk leaderboard invite.' },
+      set_channel:     { customId: 'setup1:invite:ch_main',        title: 'Set Invite Channel',        desc: 'Pilih channel utama untuk informasi invite.',       configKey: 'channelId',           previewLabel: 'Invite Channel' },
+      set_logs:        { customId: 'setup1:invite:ch_logs',         title: 'Set Logs Channel',          desc: 'Pilih channel untuk log detail invite.',             configKey: 'logsChannelId',       previewLabel: 'Logs Channel' },
+      set_leaderboard: { customId: 'setup1:invite:ch_leaderboard',  title: 'Set Leaderboard Channel',   desc: 'Pilih channel untuk leaderboard invite.',            configKey: 'leaderboardChannelId', previewLabel: 'Leaderboard Channel' },
     };
 
+    // Show channel select page
     if (channelSelectTargets[action]) {
       const { customId, title, desc } = channelSelectTargets[action];
+      // Store which channel type is being changed so confirm/retry know what to do
+      session.wizardData.pendingChannelTarget = action;
       const page = buildChannelSelectPage(title, desc, customId, 'setup1:invite:back_to_page');
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
-    if (action === 'ch_main') {
-      await updateSection(session.guildId, 'invite', { channelId: interaction.values[0] });
+    // Channel selected — stage in session and show preview (don't save yet)
+    const chSelectActions = { ch_main: 'set_channel', ch_logs: 'set_logs', ch_leaderboard: 'set_leaderboard' };
+    if (chSelectActions[action]) {
+      const target = channelSelectTargets[chSelectActions[action]];
+      session.wizardData.pendingChannel = interaction.values[0];
+      session.wizardData.pendingChannelTarget = chSelectActions[action];
+      const page = buildChannelPreviewPage(
+        `📨  Invite Tracker — ${target.previewLabel} Preview`,
+        target.desc,
+        interaction.values[0],
+        'setup1:invite:ch_confirm',
+        'setup1:invite:ch_retry',
+        'setup1:invite:back_to_page',
+      );
+      return interaction.update({ embeds: [page.embed], components: page.components });
+    }
+
+    // Confirmed — persist staged channel to config
+    if (action === 'ch_confirm') {
+      const channelId = session.wizardData.pendingChannel;
+      const targetKey = channelSelectTargets[session.wizardData.pendingChannelTarget]?.configKey;
+      if (channelId && targetKey) {
+        await updateSection(session.guildId, 'invite', { [targetKey]: channelId });
+      }
+      delete session.wizardData.pendingChannel;
+      delete session.wizardData.pendingChannelTarget;
       const page = await plugin.buildPage(await reload());
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
-    if (action === 'ch_logs') {
-      await updateSection(session.guildId, 'invite', { logsChannelId: interaction.values[0] });
-      const page = await plugin.buildPage(await reload());
-      return interaction.update({ embeds: [page.embed], components: page.components });
-    }
-
-    if (action === 'ch_leaderboard') {
-      await updateSection(session.guildId, 'invite', { leaderboardChannelId: interaction.values[0] });
-      const page = await plugin.buildPage(await reload());
-      return interaction.update({ embeds: [page.embed], components: page.components });
+    // Retry — re-show the same channel select page
+    if (action === 'ch_retry') {
+      const tgt = channelSelectTargets[session.wizardData.pendingChannelTarget];
+      delete session.wizardData.pendingChannel;
+      if (tgt) {
+        const page = buildChannelSelectPage(tgt.title, tgt.desc, tgt.customId, 'setup1:invite:back_to_page');
+        return interaction.update({ embeds: [page.embed], components: page.components });
+      }
     }
 
     if (action === 'back_to_page') {
+      delete session.wizardData.pendingChannel;
+      delete session.wizardData.pendingChannelTarget;
       const page = await plugin.buildPage(cfg);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }

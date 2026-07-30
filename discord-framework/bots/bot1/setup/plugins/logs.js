@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import {
   Colors, DIVIDER, statusDot, channelLabel,
-  buildNavRow, buildChannelSelectPage,
+  buildNavRow, buildChannelSelectPage, buildChannelPreviewPage,
 } from '../ui.js';
 import { updateSection, loadGuildConfig } from '../config.js';
 
@@ -121,14 +121,54 @@ const plugin = {
     if (action === 'ch_select') {
       const catId = session.wizardData.logsCategory;
       if (!catId) return;
-      const channels = { ...cfg.logs.channels, [catId]: interaction.values[0] };
-      await updateSection(session.guildId, 'logs', { channels });
+      const cat = LOG_CATEGORIES.find((c) => c.id === catId);
+      // Stage selected channel — show preview before saving
+      session.wizardData.pendingChannel = interaction.values[0];
+      const page = buildChannelPreviewPage(
+        `📜  Logs — ${cat?.label ?? catId} Preview`,
+        `Channel ini akan digunakan untuk ${cat?.desc ?? catId}.`,
+        interaction.values[0],
+        'setup1:logs:ch_confirm',
+        'setup1:logs:ch_retry',
+        'setup1:logs:back_to_page',
+      );
+      return interaction.update({ embeds: [page.embed], components: page.components });
+    }
+
+    // Confirmed — persist staged channel to config for current log category
+    if (action === 'ch_confirm') {
+      const catId = session.wizardData.logsCategory;
+      const channelId = session.wizardData.pendingChannel;
+      if (catId && channelId) {
+        const fresh = await reload();
+        const channels = { ...fresh.logs.channels, [catId]: channelId };
+        await updateSection(session.guildId, 'logs', { channels });
+      }
       session.wizardData.logsCategory = null;
+      session.wizardData.pendingChannel = null;
       const page = await plugin.buildPage(await reload());
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
+    // Retry — re-show channel select for the same category
+    if (action === 'ch_retry') {
+      const catId = session.wizardData.logsCategory;
+      const cat = LOG_CATEGORIES.find((c) => c.id === catId);
+      session.wizardData.pendingChannel = null;
+      if (cat) {
+        const page = buildChannelSelectPage(
+          `📜  Logs — Set Channel: ${cat.label}`,
+          `Pilih channel untuk ${cat.desc}.`,
+          'setup1:logs:ch_select',
+          'setup1:logs:back_to_page',
+        );
+        return interaction.update({ embeds: [page.embed], components: page.components });
+      }
+    }
+
     if (action === 'back_to_page') {
+      session.wizardData.logsCategory = null;
+      session.wizardData.pendingChannel = null;
       const page = await plugin.buildPage(cfg);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }

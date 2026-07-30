@@ -17,7 +17,7 @@ import {
 } from 'discord.js';
 import {
   Colors, DIVIDER, statusDot, channelLabel,
-  buildNavRow, buildChannelSelectPage,
+  buildNavRow, buildChannelSelectPage, buildChannelPreviewPage,
 } from '../ui.js';
 import { updateSection, loadGuildConfig } from '../config.js';
 
@@ -135,14 +135,45 @@ const plugin = {
     }
 
     if (action === 'ch_select') {
-      const channelId = interaction.values[0];
-      await updateSection(session.guildId, 'welcome', { channelId });
+      // Stage the selected channel — don't save yet; show preview first
+      session.wizardData.pendingChannel = interaction.values[0];
+      const page = buildChannelPreviewPage(
+        '📢  Welcome Channel — Preview',
+        'Channel ini akan digunakan untuk mengirim pesan selamat datang & selamat tinggal.',
+        interaction.values[0],
+        'setup1:welcome:ch_confirm',
+        'setup1:welcome:ch_retry',
+        'setup1:welcome:back_to_page',
+      );
+      return interaction.update({ embeds: [page.embed], components: page.components });
+    }
+
+    // User confirmed the channel selection → now save to config
+    if (action === 'ch_confirm') {
+      const channelId = session.wizardData.pendingChannel;
+      if (channelId) {
+        await updateSection(session.guildId, 'welcome', { channelId });
+        delete session.wizardData.pendingChannel;
+      }
       const fresh = await loadGuildConfig(session.guildId);
       const page = await plugin.buildPage(fresh);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
+    // User wants to re-pick the channel
+    if (action === 'ch_retry') {
+      delete session.wizardData.pendingChannel;
+      const page = buildChannelSelectPage(
+        '📢  Set Welcome Channel',
+        'Pilih channel tempat bot akan mengirim pesan welcome/goodbye.',
+        'setup1:welcome:ch_select',
+        'setup1:welcome:back_to_page',
+      );
+      return interaction.update({ embeds: [page.embed], components: page.components });
+    }
+
     if (action === 'back_to_page') {
+      delete session.wizardData.pendingChannel;
       const page = await plugin.buildPage(cfg);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
