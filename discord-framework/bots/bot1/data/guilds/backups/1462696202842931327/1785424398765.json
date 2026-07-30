@@ -6,11 +6,11 @@
   },
   "welcome": {
     "enabled": true,
-    "channelId": "1462696203241132123",
+    "channelId": null,
     "embed": {
-      "title": "◈│Selamat Datang, {user}",
-      "description": "❖ Halo, {mention}!\n\nSelamat datang di **{server}**.\n\n✦ Semoga betah, temukan teman baru, dan nikmati setiap fitur yang telah kami sediakan.\n\n━━━━━━━━━━━━━━━━━━\n⚔️ Selamat Bergabung\n━━━━━━━━━━━━━━━━━━",
-      "color": "#B91C1C"
+      "title": "Selamat Datang, {user}!",
+      "description": "",
+      "color": "#5865F2"
     },
     "gif": null,
     "image": null
@@ -50,15 +50,15 @@
     ]
   },
   "invite": {
-    "enabled": false,
-    "logChannelId": null,
-    "joinChannelId": null,
+    "enabled": true,
+    "logChannelId": "1532403653489594541",
+    "joinChannelId": "1532403653489594541",
     "embed": {
-      "title": "👋 {user} bergabung ke {server}!",
-      "description": "Diundang oleh **{inviter}** menggunakan kode `{inviteCode}`.\nTotal invite: **{totalInvites}** | Fake: **{fakeInvites}** | Pergi: **{leaveInvites}**",
-      "color": "#5865F2",
+      "title": "✦ {user} bergabung ke {server}",
+      "description": "━━━━━━━━━━━━━━━━━━\n👤 Diundang oleh: **{inviter}**\n🔗 Kode Invite: **{inviteCode}**\n\n📊 Statistik Invite\n├ ✦ Total : **{totalInvites}**\n├ ✦ Fake : **{fakeInvites}**\n└ ✦ Keluar : **{leaveInvites}**\n\n✨ Selamat datang di server!\n━━━━━━━━━━━━━━━━━━",
+      "color": "#1A1A1A",
       "thumbnail": null,
-      "footer": "Invite Tracker",
+      "footer": "✦ Welcome to the Shadow Realm",
       "image": null,
       "gif": null
     },
@@ -75,7 +75,7 @@
       "channel": null,
       "moderation": null,
       "welcome": null,
-      "error": null
+      "error": "1524811326742855690"
     }
   },
   "channelManager": {
@@ -85,5 +85,7 @@
     "enabled": false,
     "backups": []
   },
-  "configVersion": 1
+  "configVersion": 1,
+  "_backupId": "1785424398765",
+  "_backupDate": "2026-07-30T15:13:18.765Z"
 }
