@@ -1646,12 +1646,7 @@
     "confirmationAction": true
   },
   "afk": {
-    "users": {
-      "1462685321262272664": {
-        "reason": "Berak",
-        "timestamp": 1785441570494
-      }
-    }
+    "users": {}
   },
   "autothread": {
     "channels": [
