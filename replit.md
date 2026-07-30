@@ -56,11 +56,15 @@ discord-framework/
           index.js                — AUTO plugin loader (no manual registry)
           server.js               — Server Settings plugin
           welcome.js              — Welcome & Goodbye plugin
-          takeRole.js             — Take Role wizard plugin
+          takeRole.js             — Take Role wizard plugin (full feature)
           invite.js               — Invite Tracker plugin
           channelManager.js       — Channel Manager plugin
           logs.js                 — Logs plugin
           backup.js               — Backup plugin (with config backup/restore)
+      features/
+        takeRole/
+          panelBuilder.js         — builds panel embed + components (tr1: prefix)
+          handler.js              — runtime handler: button clicks, dropdown selects
       data/guilds/                — persistent guild config JSON files
                                     guilds/<guildId>.json
                                     guilds/backups/<guildId>/<timestamp>.json

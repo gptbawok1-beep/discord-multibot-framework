@@ -2,8 +2,9 @@
  * Bot 1 — Event: interactionCreate
  *
  * Routes all incoming interactions:
- *   1. ChatInputCommand   → shared slash command handler
+ *   1. ChatInputCommand         → shared slash command handler
  *   2. setup1:* components & modals → Setup Wizard handler
+ *   3. tr1:* components        → Take Role panel runtime handler
  *
  * Only the shared handlers (shared/handlers/) are untouched;
  * this file is Bot 1-specific and may be extended freely.
@@ -12,6 +13,7 @@
 import { BaseEvent } from '../../../shared/structures/index.js';
 import { handleSlashCommand } from '../../../shared/handlers/slashHandler.js';
 import { handleInteraction as handleSetupInteraction } from '../setup/index.js';
+import { handlePanelInteraction } from '../features/takeRole/handler.js';
 import { createLogger } from '../../../shared/logger/index.js';
 
 const logger = createLogger('BOT1');
@@ -29,13 +31,24 @@ export default class InteractionCreateEvent extends BaseEvent {
         return;
       }
 
+      const customId = interaction.customId ?? '';
+
       // ── Setup Wizard: buttons, select menus, modals ───────────────────
       // All Setup Wizard custom IDs start with 'setup1:'
-      const customId = interaction.customId ?? '';
       if (customId.startsWith('setup1:')) {
         const handled = await handleSetupInteraction(interaction);
         if (!handled) {
           logger.warn(`Unhandled setup interaction: ${customId}`);
+        }
+        return;
+      }
+
+      // ── Take Role panel runtime interactions ──────────────────────────
+      // All Take Role panel custom IDs start with 'tr1:'
+      if (customId.startsWith('tr1:')) {
+        const handled = await handlePanelInteraction(interaction);
+        if (!handled) {
+          logger.warn(`Unhandled Take Role panel interaction: ${customId}`);
         }
         return;
       }
