@@ -1627,5 +1627,31 @@
     "enabled": false,
     "backups": []
   },
+  "moderation": {
+    "enabled": true,
+    "moderatorRoles": [
+      "1462696203241132118",
+      "1462696203241132117"
+    ],
+    "adminRoles": [
+      "1462696203241132118",
+      "1462696203241132117"
+    ],
+    "protectedRoles": [
+      "1462696203241132118",
+      "1462696203241132117"
+    ],
+    "dmNotification": true,
+    "defaultReason": "Tidak ada alasan.",
+    "confirmationAction": true
+  },
+  "afk": {
+    "users": {}
+  },
+  "autothread": {
+    "channels": [
+      "1462696203694379108"
+    ]
+  },
   "configVersion": 1
 }
