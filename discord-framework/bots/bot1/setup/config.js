@@ -49,10 +49,18 @@ export function defaultConfig() {
       //   roles: [{ roleId, name, emoji, description }] }
     },
     invite: {
-      enabled:              false,
-      channelId:            null,
-      logsChannelId:        null,
-      leaderboardChannelId: null,
+      enabled:        false,
+      logChannelId:   null,   // main channel: join logs / notifications
+      joinChannelId:  null,   // optional separate join notification channel
+      embed: {
+        title:       '👋 {user} bergabung ke {server}!',
+        description: 'Diundang oleh **{inviter}** menggunakan kode `{inviteCode}`.\nTotal invite: **{totalInvites}** | Fake: **{fakeInvites}** | Pergi: **{leaveInvites}**',
+        color:       '#5865F2',
+        thumbnail:   null,
+        footer:      'Invite Tracker',
+        image:       null,
+        gif:         null,
+      },
     },
     logs: {
       enabled:  false,
