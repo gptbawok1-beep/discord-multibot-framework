@@ -1,0 +1,78 @@
+{
+  "server": {
+    "prefix": "!",
+    "language": "id",
+    "timezone": "Asia/Jakarta"
+  },
+  "welcome": {
+    "enabled": false,
+    "channelId": null,
+    "embed": {
+      "title": "Selamat Datang, {user}!",
+      "description": "",
+      "color": "#5865F2"
+    },
+    "gif": null,
+    "image": null
+  },
+  "takeRole": {
+    "enabled": true,
+    "panels": [
+      {
+        "id": "ms7daisj",
+        "channelId": "1465381701013209199",
+        "messageId": "1532333203296096397",
+        "mode": "dropdown",
+        "title": "🩸・Take Your Role",
+        "description": "# 👋 Welcome.\n\nSelamat datang di **PangeranAsisten**.\n\nPilih role yang paling sesuai dengan kebutuhanmu untuk mendapatkan akses ke channel, notifikasi, dan berbagai fitur yang tersedia di server.\n\n━━━━━━━━━━━━━━━━━━\n⚔️ Pilih role melalui menu di bawah.\n✨ Selamat bergabung dan semoga betah!\n━━━━━━━━━━━━━━━━━━",
+        "color": "#8B0000",
+        "footer": "🩸 One choice. One path. One identity.",
+        "thumbnail": "https://files.catbox.moe/m4v728.gif",
+        "placeholder": "Pilih role...",
+        "maxRoles": 1,
+        "single": true,
+        "toggle": false,
+        "roles": [
+          {
+            "roleId": "1462696202842931329",
+            "name": "『👤』Members",
+            "emoji": null,
+            "description": null
+          },
+          {
+            "roleId": "1525951735879696555",
+            "name": "『🎶』 Akses Boombox",
+            "emoji": null,
+            "description": null
+          }
+        ]
+      }
+    ]
+  },
+  "invite": {
+    "enabled": false,
+    "channelId": null,
+    "logsChannelId": null,
+    "leaderboardChannelId": null
+  },
+  "logs": {
+    "enabled": false,
+    "channels": {
+      "member": null,
+      "role": null,
+      "invite": null,
+      "channel": null,
+      "moderation": null,
+      "welcome": null,
+      "error": "1524811326742855690"
+    }
+  },
+  "channelManager": {
+    "backups": []
+  },
+  "backup": {
+    "enabled": false,
+    "backups": []
+  },
+  "configVersion": 1
+}
