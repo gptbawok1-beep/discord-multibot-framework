@@ -101,6 +101,14 @@ export function defaultConfig() {
     autothread: {
       channels: [], // Channel IDs with auto-thread enabled
     },
+    giveaway: {
+      managerRoleId: null,  // Role allowed to manage giveaways (besides owner)
+      channelId:     null,  // Default channel for posting giveaways
+      logChannelId:  null,  // Optional log channel for giveaway results
+      mentionRoleId: null,  // Optional role to mention when a giveaway starts
+      autoRecovery:  true,  // Re-schedule active giveaways after restart
+      autoDelete:    false, // Delete giveaway message ~10s after it ends
+    },
   };
 }
 

@@ -156,6 +156,42 @@ const CATEGORIES = [
     ].join('\n'),
   },
 
+  {
+    value:       'giveaway',
+    label:       'Giveaway',
+    emoji:       '🎉',
+    description: 'Buat dan kelola giveaway dengan panel interaktif.',
+    guide: [
+      '**🎉 Giveaway**',
+      'Buat giveaway interaktif dengan panel Join, Participants, dan Info.',
+      DIVIDER,
+      '**Cara Setup:**',
+      '`/setup bot1` → **🎉 Giveaway** → Atur Manager Role & Channel',
+      '',
+      '**Prefix Commands:**',
+      '• `!gcreate <durasi> <pemenang> <hadiah>` — Buat giveaway',
+      '  _Contoh: `!gcreate 1h 1 Nitro Classic`_',
+      '• `!gend <id>` — Akhiri giveaway lebih awal',
+      '• `!greroll <id>` — Pilih ulang pemenang',
+      '• `!gcancel <id>` — Batalkan giveaway',
+      '• `!glist` — Lihat giveaway yang aktif',
+      '',
+      '**Slash Commands:**',
+      '• `/giveaway create` — Buat giveaway (dengan pilihan channel & role)',
+      '• `/giveaway end` — Akhiri giveaway',
+      '• `/giveaway reroll` — Pilih ulang pemenang',
+      '• `/giveaway cancel` — Batalkan giveaway',
+      '• `/giveaway list` — Lihat giveaway aktif',
+      '',
+      '**Durasi valid:** `10m` `30m` `1h` `2h` `6h` `12h` `1d` `2d` `7d`',
+      DIVIDER,
+      '💡 **Tips**',
+      '• Semua giveaway bertahan setelah restart (Auto Recovery).',
+      '• Peserta klik 🎉 untuk ikut, klik lagi untuk keluar.',
+      '• Gunakan `required_role` untuk membatasi siapa yang bisa ikut.',
+    ].join('\n'),
+  },
+
   // ── Tambahkan fitur baru di sini ──────────────────────────────────────────
   // Contoh (hapus komentar saat fitur sudah diimplementasikan):
   //

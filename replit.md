@@ -90,6 +90,54 @@ discord-framework/
 - **Permission System**: Each plugin declares `requiredPermission: PermissionFlagsBits.X`. The wizard checks this before showing the plugin page.
 - **Validation Before Save**: Channel and role saves call `validateTextChannel` / `validateRole` from `shared/setup/validation.js` before persisting, showing a clear error if validation fails.
 
+## Giveaway System (Bot 1)
+
+Full giveaway system built on the existing Shared Setup Engine and Persistent Config.
+
+### Setup
+`/setup bot1` → **🎉 Giveaway** to configure:
+- Giveaway Manager Role (who can run giveaway commands)
+- Default Giveaway Channel
+- Log Channel (optional)
+- Mention Role (optional — pinged when a giveaway starts)
+- Auto Recovery ON/OFF
+- Auto Delete ON/OFF
+
+### Commands
+| Prefix | Slash | Action |
+|---|---|---|
+| `!gcreate <durasi> <pemenang> <hadiah>` | `/giveaway create` | Buat giveaway |
+| `!gend <id>` | `/giveaway end` | Akhiri lebih awal |
+| `!greroll <id>` | `/giveaway reroll` | Pilih ulang pemenang |
+| `!gcancel <id>` | `/giveaway cancel` | Batalkan |
+| `!glist` | `/giveaway list` | Lihat giveaway aktif |
+
+Valid durations: `10m` `30m` `1h` `2h` `6h` `12h` `1d` `2d` `7d`
+
+### Files
+```
+bots/bot1/
+  features/giveaway/
+    store.js     — persistent JSON per guild  (data/giveaways/<guildId>.json)
+    embed.js     — all Discord embed & component builders
+    perm.js      — permission check (owner OR manager role)
+    manager.js   — core logic: create/end/cancel/reroll, timers, recovery, button handlers
+  setup/plugins/giveaway.js   — /setup bot1 wizard plugin (auto-loaded)
+  commands/prefix/
+    gcreate.js | gend.js | greroll.js | gcancel.js | glist.js
+  commands/slash/giveaway.js  — /giveaway subcommand group
+```
+
+### Panel Interaction Routing
+All giveaway panel buttons use `gw1:<messageId>:<action>` custom IDs.
+Routed in `bots/bot1/events/interactionCreate.js` → `handleGiveawayInteraction()`.
+
+### Persistence & Recovery
+- Giveaway data: `bots/bot1/data/giveaways/<guildId>.json`
+- On bot restart: `recoverGiveaways()` is called via plugin's `onRecover` hook.
+- Timers are rescheduled from persistent `endsAt` timestamps.
+- Giveaways past their end time are ended automatically on recovery.
+
 ## User preferences
 
 - Language: Bahasa Indonesia for UI strings in Discord embeds, English for code comments.

@@ -15,6 +15,7 @@ import { handleSlashCommand } from '../../../shared/handlers/slashHandler.js';
 import { handleInteraction as handleSetupInteraction } from '../setup/index.js';
 import { handlePanelInteraction } from '../features/takeRole/handler.js';
 import { handleHelpInteraction } from '../commands/slash/help.js';
+import { handleGiveawayInteraction } from '../features/giveaway/manager.js';
 import { createLogger } from '../../../shared/logger/index.js';
 
 const logger = createLogger('BOT1');
@@ -60,6 +61,17 @@ export default class InteractionCreateEvent extends BaseEvent {
         const handled = await handleHelpInteraction(interaction);
         if (!handled) {
           logger.warn(`Unhandled help interaction: ${customId}`);
+        }
+        return;
+      }
+
+      // ── Giveaway panel interactions ───────────────────────────────────
+      // All Giveaway panel custom IDs start with 'gw1:'
+      // Format: gw1:<messageId>:<action>
+      if (customId.startsWith('gw1:')) {
+        const handled = await handleGiveawayInteraction(interaction);
+        if (!handled) {
+          logger.warn(`Unhandled giveaway interaction: ${customId}`);
         }
         return;
       }
