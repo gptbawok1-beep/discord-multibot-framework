@@ -192,16 +192,41 @@ const CATEGORIES = [
     ].join('\n'),
   },
 
+  {
+    value:       'systemmanager',
+    label:       'System Manager',
+    emoji:       '🚨',
+    description: 'Error system, system logs, backup, status, audit, dan advanced.',
+    guide: [
+      '**🚨 System Manager**',
+      'Core module untuk monitoring dan manajemen sistem bot.',
+      DIVIDER,
+      '**Cara Setup:**',
+      '`/setup bot1` → **🚨 System Manager**',
+      '',
+      '**Sub-modul:**',
+      '• 🚨 **Error System** — Kustomisasi pesan error pengguna, log error, auto-retry',
+      '• 📜 **System Logs** — Satu log channel untuk semua event bot (start, backup, error, dll)',
+      '• 💾 **Backup & Restore** — Backup dan restore seluruh konfigurasi bot',
+      '• 📊 **Bot Status** — Uptime, ping, memori, CPU, jumlah server & user',
+      '• 📋 **Audit Config** — Cek kelengkapan konfigurasi semua fitur sekaligus',
+      '• ⚙️ **Advanced** — Debug mode, maintenance mode, retry limit, timeout',
+      '',
+      '**Placeholder Error Message:**',
+      '• `{user}` — Nama pengguna',
+      '• `{feature}` — Nama fitur yang error',
+      '• `{error_code}` — Kode error unik',
+      '• `{server}` — Nama server',
+      '• `{time}` — Waktu kejadian',
+      DIVIDER,
+      '💡 **Tips**',
+      '• Aktifkan **System Logs** agar semua event tercatat di satu channel.',
+      '• Gunakan **Audit Config** untuk memastikan semua fitur sudah terkonfigurasi.',
+      '• **Maintenance Mode** menghentikan semua perintah sementara.',
+    ].join('\n'),
+  },
+
   // ── Tambahkan fitur baru di sini ──────────────────────────────────────────
-  // Contoh (hapus komentar saat fitur sudah diimplementasikan):
-  //
-  // {
-  //   value:       'logs',
-  //   label:       'Logs',
-  //   emoji:       '📜',
-  //   description: 'Log otomatis berbagai aktivitas server.',
-  //   guide: '...',
-  // },
 ];
 
 // ── Build helpers ─────────────────────────────────────────────────────────────
