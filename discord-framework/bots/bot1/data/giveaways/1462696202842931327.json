@@ -12,8 +12,25 @@
     ],
     "requiredRoleId": null,
     "mentionRoleId": "1462696202842931328",
-    "status": "active",
-    "winners": [],
+    "status": "ended",
+    "winners": [
+      "1462685321262272664"
+    ],
     "createdAt": 1785490867508
+  },
+  "1532685829397549057": {
+    "id": "1532685829397549057",
+    "guildId": "1462696202842931327",
+    "channelId": "1462696203241132125",
+    "hostId": "1462685321262272664",
+    "prize": "Tes potur",
+    "winnerCount": 1,
+    "endsAt": 1785491237337,
+    "participants": [],
+    "requiredRoleId": "1462696202842931329",
+    "mentionRoleId": null,
+    "status": "ended",
+    "winners": [],
+    "createdAt": 1785491177337
   }
 }
