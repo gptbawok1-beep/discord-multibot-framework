@@ -1661,5 +1661,32 @@
     "autoRecovery": true,
     "autoDelete": false
   },
+  "systemManager": {
+    "errorSystem": {
+      "logChannelId": "1524811326742855690",
+      "autoRetry": true,
+      "autoRecommendation": true,
+      "retryLimit": 3,
+      "userMessage": {
+        "title": "❌ Terjadi Kesalahan",
+        "description": "Fitur **{feature}** mengalami error.\nSilakan coba lagi atau hubungi admin.",
+        "footer": "Error Code: {error_code} | {time}",
+        "color": "#ED4245",
+        "emoji": "❌",
+        "gif": null
+      }
+    },
+    "systemLogs": {
+      "enabled": true,
+      "channelId": "1524811326742855690"
+    },
+    "advanced": {
+      "debugMode": true,
+      "retryLimit": 3,
+      "defaultTimeout": 30,
+      "maintenanceMode": false
+    },
+    "errorHistory": []
+  },
   "configVersion": 1
 }
