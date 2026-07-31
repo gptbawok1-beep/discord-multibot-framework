@@ -483,7 +483,28 @@ const plugin = {
     // ── Step 3: Winner count (after duration selected) ─────────────────────
     if (action === 'gw_dur') {
       const val = interaction.values[0];
-      const ms  = parseDuration(val);
+
+      // Custom duration — open modal for free-text input
+      if (val === '__custom__') {
+        const { ModalBuilder, TextInputBuilder, TextInputStyle } = await import('discord.js');
+        const modal = new ModalBuilder()
+          .setCustomId('setup1:modal:giveaway:gw_dur_custom')
+          .setTitle('⏱️ Custom Durasi Giveaway');
+        modal.addComponents(
+          new ActionRowBuilder().addComponents(
+            new TextInputBuilder()
+              .setCustomId('custom_duration')
+              .setLabel('Durasi (angka + m/h/d)')
+              .setStyle(TextInputStyle.Short)
+              .setPlaceholder('Contoh: 45m · 90m · 3h · 5d  (min 1m, maks 7d)')
+              .setMaxLength(10)
+              .setRequired(true),
+          ),
+        );
+        return interaction.showModal(modal);
+      }
+
+      const ms = parseDuration(val);
       if (!ms) {
         return interaction.update({
           embeds: [buildErrorEmbed('Durasi tidak valid. Silakan pilih ulang.')],
@@ -640,6 +661,24 @@ const plugin = {
       setDraft(session, { prize });
       return showDurationStep(interaction, session);
     }
+
+    // Step 2b result: custom duration entered
+    if (field === 'gw_dur_custom') {
+      const raw = interaction.fields.getTextInputValue('custom_duration').trim();
+      const ms  = parseDuration(raw);
+      if (!ms) {
+        return interaction.reply({
+          content:
+            `❌ Durasi \`${raw}\` tidak valid.\n\n` +
+            `Format: angka + \`m\` (menit), \`h\` (jam), atau \`d\` (hari).\n` +
+            `Contoh: \`45m\` · \`90m\` · \`3h\` · \`5d\`\n` +
+            `Min: **1 menit** · Maks: **7 hari**`,
+          ephemeral: true,
+        });
+      }
+      setDraft(session, { durationMs: ms, durationLabel: raw });
+      return showWinnerStep(interaction, session);
+    }
   },
 
   // ── Auto-recovery hook ────────────────────────────────────────────────────
@@ -660,19 +699,24 @@ function showDurationStep(interaction, session) {
     .setColor(Colors.DARK ?? 0x2B2D31)
     .setAuthor({ name: '🎉 Buat Giveaway — Langkah 2/7: Durasi' })
     .setDescription(
-      `**Hadiah:** ${draft.prize}\n${DIVIDER}\nPilih berapa lama giveaway berlangsung.`
+      `**Hadiah:** ${draft.prize}\n${DIVIDER}\nPilih berapa lama giveaway berlangsung.\n` +
+      `Pilih **✏️ Custom...** untuk memasukkan menit bebas (min 1m, maks 7d).`
     );
 
   const options = [
-    { label: '10 Menit',  value: '10m' },
-    { label: '30 Menit',  value: '30m' },
-    { label: '1 Jam',     value: '1h'  },
-    { label: '2 Jam',     value: '2h'  },
-    { label: '6 Jam',     value: '6h'  },
-    { label: '12 Jam',    value: '12h' },
-    { label: '1 Hari',    value: '1d'  },
-    { label: '2 Hari',    value: '2d'  },
-    { label: '7 Hari',    value: '7d'  },
+    { label: '1 Menit',   value: '1m',       description: 'Cocok untuk tes cepat'       },
+    { label: '5 Menit',   value: '5m'                                                    },
+    { label: '10 Menit',  value: '10m'                                                   },
+    { label: '15 Menit',  value: '15m'                                                   },
+    { label: '30 Menit',  value: '30m'                                                   },
+    { label: '1 Jam',     value: '1h'                                                    },
+    { label: '2 Jam',     value: '2h'                                                    },
+    { label: '6 Jam',     value: '6h'                                                    },
+    { label: '12 Jam',    value: '12h'                                                   },
+    { label: '1 Hari',    value: '1d'                                                    },
+    { label: '2 Hari',    value: '2d'                                                    },
+    { label: '7 Hari',    value: '7d'                                                    },
+    { label: '✏️ Custom...', value: '__custom__', description: 'Ketik durasi bebas, contoh: 45m, 3h, 5d' },
   ];
 
   const select = new StringSelectMenuBuilder()

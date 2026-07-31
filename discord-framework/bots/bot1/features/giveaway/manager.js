@@ -40,8 +40,8 @@ const timers = new Map();
 // Duration parser
 // ---------------------------------------------------------------------------
 
-/** Valid duration examples the user can pass */
-export const VALID_DURATIONS = ['10m', '30m', '1h', '2h', '6h', '12h', '1d', '2d', '7d'];
+/** Valid duration format hint shown in error messages */
+export const VALID_DURATIONS = ['1m', '5m', '10m', '30m', '45m', '1h', '2h', '6h', '12h', '1d', '2d', '7d'];
 
 /**
  * Parse a duration string like "10m", "2h", "1d" into milliseconds.
@@ -59,8 +59,8 @@ export function parseDuration(str) {
   const ms = unit === 'm' ? n * 60_000
            : unit === 'h' ? n * 3_600_000
            :                 n * 86_400_000;
-  // Min 10 minutes, max 7 days
-  if (ms < 10 * 60_000)        return null;
+  // Min 1 minute, max 7 days
+  if (ms < 60_000)             return null;
   if (ms > 7 * 86_400_000)     return null;
   return ms;
 }

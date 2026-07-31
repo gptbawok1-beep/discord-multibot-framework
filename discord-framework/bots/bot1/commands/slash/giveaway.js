@@ -60,19 +60,9 @@ export default class GiveawayCommand extends BaseCommand {
             .addStringOption((opt) =>
               opt
                 .setName('durasi')
-                .setDescription('Durasi giveaway (contoh: 1h, 30m, 2d).')
+                .setDescription('Durasi giveaway. Format: angka + m/h/d. Contoh: 5m, 45m, 1h, 2d (min 1m, maks 7d).')
                 .setRequired(true)
-                .addChoices(
-                  { name: '10 Menit',  value: '10m' },
-                  { name: '30 Menit',  value: '30m' },
-                  { name: '1 Jam',     value: '1h'  },
-                  { name: '2 Jam',     value: '2h'  },
-                  { name: '6 Jam',     value: '6h'  },
-                  { name: '12 Jam',    value: '12h' },
-                  { name: '1 Hari',    value: '1d'  },
-                  { name: '2 Hari',    value: '2d'  },
-                  { name: '7 Hari',    value: '7d'  },
-                )
+                .setMaxLength(10)
             )
             .addIntegerOption((opt) =>
               opt

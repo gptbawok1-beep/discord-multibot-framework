@@ -1,0 +1,19 @@
+{
+  "1532684529620226270": {
+    "id": "1532684529620226270",
+    "guildId": "1462696202842931327",
+    "channelId": "1462696203241132125",
+    "hostId": "1462685321262272664",
+    "prize": "Bakso 1menit",
+    "winnerCount": 1,
+    "endsAt": 1785491467508,
+    "participants": [
+      "1462685321262272664"
+    ],
+    "requiredRoleId": null,
+    "mentionRoleId": "1462696202842931328",
+    "status": "active",
+    "winners": [],
+    "createdAt": 1785490867508
+  }
+}
