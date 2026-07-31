@@ -149,7 +149,7 @@ export default class GiveawayCommand extends BaseCommand {
   async execute(client, interaction) {
     const sub = interaction.options.getSubcommand();
 
-    // ── Permission check (all subcommands except list require manager) ───────
+    // ── Permission check (all subcommands require Owner or Manager Role) ───────
     const cfg = await loadGuildConfig(interaction.guildId).catch(() => null);
 
     if (!canManageGiveaway(interaction.member, cfg, interaction.guild.ownerId)) {

@@ -378,7 +378,8 @@ const plugin = {
       delete session.wizardData.pendingChannel;
       delete session.wizardData.pendingChannelAction;
       delete session.wizardData.pendingRoleAction;
-      const page = await plugin.buildPage(cfg);
+      const fresh = await reload();
+      const page  = await plugin.buildPage(fresh);
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
@@ -699,11 +700,11 @@ function showWinnerStep(interaction, session) {
       `Pilih jumlah pemenang.`
     );
 
-  const options = [1, 2, 3, 4, 5, 10, 15, 20].map((n) => ({
-    label:       `${n} Pemenang`,
-    value:       String(n),
-    description: n === 1 ? 'Default' : undefined,
-  }));
+  const options = [1, 2, 3, 4, 5, 10, 15, 20].map((n) => {
+    const opt = { label: `${n} Pemenang`, value: String(n) };
+    if (n === 1) opt.description = 'Default';
+    return opt;
+  });
 
   const select = new StringSelectMenuBuilder()
     .setCustomId('setup1:giveaway:gw_win')
