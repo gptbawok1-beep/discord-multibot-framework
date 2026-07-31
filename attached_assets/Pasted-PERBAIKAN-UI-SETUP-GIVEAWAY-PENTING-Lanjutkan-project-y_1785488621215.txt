@@ -1,0 +1,198 @@
+PERBAIKAN UI SETUP GIVEAWAY
+
+PENTING
+
+Lanjutkan project yang sudah ada.
+
+JANGAN membuat project baru.
+JANGAN mengubah Shared Core.
+JANGAN mengubah Setup Engine.
+JANGAN mengubah Shared Storage.
+JANGAN mengubah struktur project.
+JANGAN mengubah sistem Giveaway yang sudah berjalan.
+
+Fokus hanya merapikan tampilan dan alur Setup Giveaway.
+
+━━━━━━━━━━━━━━━━━━
+
+HAPUS DAFTAR COMMAND
+
+Pada halaman:
+
+/setup bot1
+→ Giveaway
+
+Hapus seluruh daftar command seperti:
+
+!gcreate
+!gend
+!greroll
+!gcancel
+!glist
+
+/giveaway create
+/giveaway end
+/giveaway reroll
+/giveaway cancel
+/giveaway list
+
+Jangan tampilkan command pada halaman Setup.
+
+Setup hanya untuk konfigurasi.
+
+Jika user ingin melihat command, gunakan menu Help, bukan Setup.
+
+━━━━━━━━━━━━━━━━━━
+
+RAPIKAN TAMPILAN
+
+Embed cukup menampilkan status konfigurasi.
+
+Contoh:
+
+🎉 Giveaway Settings
+
+Konfigurasi Giveaway untuk server ini.
+
+━━━━━━━━━━━━━━━━━━
+
+👤 Manager Role
+📢 Giveaway Channel
+📋 Log Channel
+📣 Mention Role
+🔄 Auto Recovery
+🗑️ Auto Delete
+🎨 Template
+
+━━━━━━━━━━━━━━━━━━
+
+Gunakan menu di bawah untuk melakukan konfigurasi.
+
+Jangan menampilkan informasi yang tidak diperlukan.
+
+━━━━━━━━━━━━━━━━━━
+
+GANTI BANYAK TOMBOL MENJADI DROPDOWN
+
+Jangan membuat terlalu banyak Button.
+
+Gunakan satu Dropdown sebagai menu utama.
+
+Contoh:
+
+⚙️ Giveaway Settings
+
+• Manager Role
+• Giveaway Channel
+• Log Channel
+• Mention Role
+• Auto Recovery
+• Auto Delete
+• Template
+• Create Giveaway
+• Giveaway Help
+
+Setelah memilih salah satu menu, baru tampilkan komponen yang diperlukan.
+
+━━━━━━━━━━━━━━━━━━
+
+CREATE GIVEAWAY
+
+Jangan mengarahkan Owner menggunakan command.
+
+Tambahkan menu:
+
+➕ Create Giveaway
+
+langsung dari:
+
+/setup bot1
+→ Giveaway
+
+Saat dipilih, jalankan Wizard menggunakan sistem Setup yang sudah ada.
+
+Urutan Wizard:
+
+1. Hadiah
+2. Durasi
+3. Jumlah Pemenang
+4. Giveaway Channel
+5. Mention Role (Opsional)
+6. Required Role (Opsional)
+7. Preview
+8. Publish
+
+Gunakan Draft → Preview → Save yang sudah ada.
+
+Jangan membuat Wizard baru.
+
+━━━━━━━━━━━━━━━━━━
+
+HELP
+
+Tambahkan menu:
+
+📖 Giveaway Help
+
+Saat dipilih tampilkan penjelasan singkat Giveaway.
+
+Jangan tampilkan daftar command panjang di halaman utama Setup.
+
+━━━━━━━━━━━━━━━━━━
+
+BUTTON
+
+Sisakan hanya tombol standar.
+
+◀ Back
+🏠 Home
+🔄 Refresh
+💾 Save
+❌ Cancel
+
+Selain itu gunakan Dropdown.
+
+Kurangi jumlah Button agar tampilan lebih bersih.
+
+━━━━━━━━━━━━━━━━━━
+
+DESAIN
+
+Prioritaskan:
+
+• Ringkas
+• Bersih
+• Mudah dipahami
+• Tidak memenuhi Embed
+• Konsisten dengan halaman Setup lainnya
+
+━━━━━━━━━━━━━━━━━━
+
+KOMPATIBILITAS
+
+Tetap gunakan:
+
+• Shared Setup Engine
+• Shared Config
+• Shared Storage
+• Draft → Preview → Save
+• Persistent Config
+• Auto Recovery
+
+Jangan mengubah API internal.
+
+━━━━━━━━━━━━━━━━━━
+
+PENYELESAIAN
+
+Jangan menyatakan selesai sebelum:
+
+✓ Halaman Giveaway lebih ringkas.
+✓ Tidak ada daftar command pada Setup.
+✓ Dropdown berfungsi.
+✓ Create Giveaway dapat dilakukan dari Setup.
+✓ Help dipindahkan ke menu terpisah.
+✓ Tidak ada Runtime Error.
+✓ Tidak ada Import Error.
+✓ Tidak ada Promise Rejection.
+✓ Tidak ada konflik dengan fitur lain.

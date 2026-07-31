@@ -1653,5 +1653,13 @@
       "1462696203694379108"
     ]
   },
+  "giveaway": {
+    "managerRoleId": "1462696203241132118",
+    "channelId": "1462696203241132125",
+    "logChannelId": null,
+    "mentionRoleId": "1462696202842931329",
+    "autoRecovery": true,
+    "autoDelete": false
+  },
   "configVersion": 1
 }
