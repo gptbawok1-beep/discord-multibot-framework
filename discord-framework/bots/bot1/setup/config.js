@@ -135,6 +135,7 @@ export function defaultConfig() {
         maintenanceMode: false,
       },
       errorHistory: [],   // [{ code, feature, time, reason, suggestion, retryStatus }]
+      backupNames:  {},   // { [backupId]: customName }
     },
   };
 }

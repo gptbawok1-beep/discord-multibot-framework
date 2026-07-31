@@ -62,7 +62,11 @@ function fmtBytes(bytes) {
 function statusDot(on) { return on ? '🟢 Aktif' : '🔴 Nonaktif'; }
 
 function fmtDate(iso) {
-  return new Date(iso).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+  return new Date(iso).toLocaleString('id-ID', {
+    timeZone:  'Asia/Jakarta',
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
 }
 
 // ─── Build Pages ──────────────────────────────────────────────────────────────
@@ -297,6 +301,11 @@ function buildSystemLogsPage(cfg) {
 
 // ─── Backup & Restore ─────────────────────────────────────────────────────────
 
+function backupLabel(b, cfg) {
+  const names = cfg?.systemManager?.backupNames ?? {};
+  return names[b.id] ?? `Backup ${fmtDate(b.date)}`;
+}
+
 async function buildBackupPage(cfg, session) {
   const guildId = session?.guildId;
   const backups = guildId ? await listBackups(guildId) : [];
@@ -309,8 +318,8 @@ async function buildBackupPage(cfg, session) {
 
   if (backups.length > 0) {
     const list = backups.slice(0, 5)
-      .map((b, i) => `**${i + 1}.** \`${b.id}\` — ${new Date(b.date).toLocaleString('id-ID')}`)
-      .join('\n');
+      .map((b, i) => `**${i + 1}.** ${backupLabel(b, cfg)}\n└ _${fmtDate(b.date)} WIB_`)
+      .join('\n\n');
     embed.addFields({ name: '📋 Backup Terbaru', value: list });
   }
 
@@ -318,6 +327,10 @@ async function buildBackupPage(cfg, session) {
     new ButtonBuilder()
       .setCustomId('setup1:systemmanager:bk_create')
       .setLabel('Backup Sekarang').setEmoji('💾').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId('setup1:systemmanager:bk_rename_pick')
+      .setLabel('Rename Backup').setEmoji('✏️').setStyle(ButtonStyle.Secondary)
+      .setDisabled(backups.length === 0),
     backBtn('sm_main'),
   );
 
@@ -329,9 +342,9 @@ async function buildBackupPage(cfg, session) {
       .setPlaceholder('Pilih backup untuk di-restore...')
       .addOptions(
         backups.slice(0, 25).map((b) => ({
-          label:       `Backup ${new Date(b.date).toLocaleString('id-ID')}`,
+          label:       backupLabel(b, cfg).slice(0, 100),
           value:       b.id,
-          description: `ID: ${b.id}`,
+          description: fmtDate(b.date) + ' WIB',
           emoji:       '♻️',
         }))
       );
@@ -871,6 +884,62 @@ const plugin = {
       return interaction.update({ embeds: [page.embed], components: page.components });
     }
 
+    // ── Rename: pick which backup ────────────────────────────────────────────
+    if (action === 'bk_rename_pick') {
+      const backups = await listBackups(guildId);
+      if (backups.length === 0) return;
+
+      const select = new StringSelectMenuBuilder()
+        .setCustomId('setup1:systemmanager:bk_rename_select')
+        .setPlaceholder('Pilih backup yang ingin diganti namanya...')
+        .addOptions(
+          backups.slice(0, 25).map((b) => ({
+            label:       backupLabel(b, cfg).slice(0, 100),
+            value:       b.id,
+            description: fmtDate(b.date) + ' WIB',
+            emoji:       '✏️',
+          }))
+        );
+
+      const embed = new EmbedBuilder()
+        .setColor(Colors.DARK)
+        .setAuthor({ name: '✏️ Rename Backup' })
+        .setDescription(`Pilih backup yang ingin diganti namanya.\n${DIVIDER}`);
+
+      return interaction.update({
+        embeds:     [embed],
+        components: [
+          new ActionRowBuilder().addComponents(select),
+          new ActionRowBuilder().addComponents(backBtn('bk_back')),
+        ],
+      });
+    }
+
+    // ── Rename: open modal with current name ─────────────────────────────────
+    if (action === 'bk_rename_select') {
+      const backupId   = interaction.values[0];
+      const currentName = backupLabel({ id: backupId, date: new Date().toISOString() }, cfg);
+
+      session.wizardData.smRenameId = backupId;
+
+      const modal = new ModalBuilder()
+        .setCustomId('setup1:modal:systemmanager:rename_backup')
+        .setTitle('✏️ Rename Backup');
+      modal.addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('name')
+            .setLabel('Nama baru untuk backup ini')
+            .setStyle(TextInputStyle.Short)
+            .setValue(currentName.startsWith('Backup ') ? '' : currentName)
+            .setMaxLength(80)
+            .setRequired(true)
+            .setPlaceholder('Contoh: Sebelum Update Plugin, Config Stabil v2...'),
+        ),
+      );
+      return interaction.showModal(modal);
+    }
+
     if (action === 'bk_restore_select') {
       const backupId = interaction.values[0];
       session.wizardData.smPendingRestoreId = backupId;
@@ -1084,6 +1153,20 @@ const plugin = {
         },
       });
       await interaction.reply({ content: gif ? `✅ GIF/Banner diset.` : `✅ GIF/Banner dihapus.`, ephemeral: true });
+    }
+
+    // ── Rename Backup ────────────────────────────────────────────────────────
+    if (field === 'rename_backup') {
+      const backupId = session.wizardData.smRenameId;
+      const newName  = interaction.fields.getTextInputValue('name').trim();
+      if (backupId && newName) {
+        const existing = cfg.systemManager?.backupNames ?? {};
+        await updateSection(guildId, 'systemManager', {
+          backupNames: { ...existing, [backupId]: newName },
+        });
+      }
+      delete session.wizardData.smRenameId;
+      await interaction.reply({ content: `✅ Nama backup berhasil diubah menjadi **${newName}**.`, ephemeral: true });
     }
 
     // ── Advanced: Retry Limit ────────────────────────────────────────────────
