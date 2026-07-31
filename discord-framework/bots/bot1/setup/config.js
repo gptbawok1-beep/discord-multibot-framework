@@ -109,6 +109,33 @@ export function defaultConfig() {
       autoRecovery:  true,  // Re-schedule active giveaways after restart
       autoDelete:    false, // Delete giveaway message ~10s after it ends
     },
+    systemManager: {
+      errorSystem: {
+        logChannelId:       null,  // Channel to log detailed error reports
+        autoRetry:          true,  // Automatically retry failed operations
+        autoRecommendation: true,  // Show fix suggestions on errors
+        retryLimit:         3,     // Max retry attempts (global default)
+        userMessage: {
+          title:       '❌ Terjadi Kesalahan',
+          description: 'Fitur **{feature}** mengalami error.\nSilakan coba lagi atau hubungi admin.',
+          footer:      'Error Code: {error_code} | {time}',
+          color:       '#ED4245',
+          emoji:       '❌',
+          gif:         null,
+        },
+      },
+      systemLogs: {
+        enabled:   false,
+        channelId: null,   // Single log channel for all system events
+      },
+      advanced: {
+        debugMode:       false,
+        retryLimit:      3,
+        defaultTimeout:  30,
+        maintenanceMode: false,
+      },
+      errorHistory: [],   // [{ code, feature, time, reason, suggestion, retryStatus }]
+    },
   };
 }
 

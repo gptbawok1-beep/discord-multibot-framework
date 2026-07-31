@@ -10,7 +10,5 @@
  *   - ApiService       (external HTTP client)
  */
 
-// No services implemented yet — framework foundation only.
-// Export services here as they are added.
-
-export {};
+// Export shared service factories here as they are added.
+export { createSystemManagerService } from './systemManager.js';

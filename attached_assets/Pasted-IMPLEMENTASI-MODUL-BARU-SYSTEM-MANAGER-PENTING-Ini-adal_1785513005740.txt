@@ -1,0 +1,335 @@
+IMPLEMENTASI MODUL BARU: SYSTEM MANAGER
+
+PENTING
+
+Ini adalah implementasi modul BARU.
+
+Jangan merombak project.
+
+Jangan membaca ulang seluruh project.
+
+Jangan melakukan refactor besar.
+
+Jangan mengubah fitur yang sudah selesai.
+
+Gunakan Setup Engine, Shared Config, Shared Storage, Permission System, dan struktur project yang sudah ada.
+
+Buka hanya file yang benar-benar diperlukan.
+
+━━━━━━━━━━━━━━━━━━
+
+JANGAN UBAH
+
+• Welcome
+• Goodbye
+• Moderation
+• Giveaway
+• Help Center
+• Link Bypass
+• Invite Tracker
+• Take Role
+• Channel Manager
+• Shared Core
+• Shared Storage
+• Setup Engine
+• Struktur Project
+
+Jika sudah berjalan, jangan disentuh.
+
+━━━━━━━━━━━━━━━━━━
+
+FITUR BARU
+
+Tambahkan menu baru pada:
+
+/setup bot1
+
+↓
+
+🚨 System Manager
+
+Gunakan UI Setup yang sudah ada.
+
+Jangan membuat Setup baru.
+
+━━━━━━━━━━━━━━━━━━
+
+SYSTEM MANAGER
+
+Gunakan Dropdown.
+
+Isi:
+
+🚨 Error System
+
+📜 System Logs
+
+💾 Backup & Restore
+
+📊 Bot Status
+
+📋 Audit Config
+
+⚙️ Advanced
+
+━━━━━━━━━━━━━━━━━━
+
+🚨 ERROR SYSTEM
+
+Gunakan Dropdown.
+
+Isi:
+
+📝 User Error Message
+
+🎨 Embed Style
+
+🖼️ Banner / GIF
+
+📢 Error Log Channel
+
+🔄 Auto Retry
+
+📚 Error History
+
+💡 Auto Recommendation
+
+━━━━━━━━━━━━━━━━━━
+
+USER ERROR MESSAGE
+
+Owner dapat mengubah:
+
+• Judul
+
+• Deskripsi
+
+• Footer
+
+• Warna
+
+• Emoji
+
+• GIF / Banner
+
+Gunakan Placeholder.
+
+Contoh:
+
+{user}
+
+{feature}
+
+{error_code}
+
+{server}
+
+{time}
+
+━━━━━━━━━━━━━━━━━━
+
+ERROR BEHAVIOUR
+
+Jika suatu fitur mengalami Error.
+
+Bot wajib membalas User.
+
+Jangan diam.
+
+Jangan gagal tanpa respon.
+
+Gunakan pesan yang dapat dikustom oleh Owner.
+
+━━━━━━━━━━━━━━━━━━
+
+OWNER DETAIL
+
+Owner dapat melihat Detail Error.
+
+Minimal:
+
+Error Code
+
+Feature
+
+Time
+
+Reason
+
+Suggestion
+
+Retry Status
+
+━━━━━━━━━━━━━━━━━━
+
+📜 SYSTEM LOGS
+
+Gunakan SATU Log Channel.
+
+Berlaku untuk seluruh Bot.
+
+Contoh Log:
+
+Bot Start
+
+Bot Restart
+
+Bot Shutdown
+
+Backup Created
+
+Backup Restored
+
+Configuration Updated
+
+API Offline
+
+API Online
+
+Error
+
+Retry Failed
+
+Jangan membuat Log Channel terpisah setiap fitur.
+
+━━━━━━━━━━━━━━━━━━
+
+💾 BACKUP & RESTORE
+
+Backup seluruh konfigurasi Bot.
+
+Restore seluruh konfigurasi Bot.
+
+Gunakan sistem yang sudah ada jika tersedia.
+
+━━━━━━━━━━━━━━━━━━
+
+📊 BOT STATUS
+
+Minimal tampilkan:
+
+Bot Status
+
+Uptime
+
+Ping
+
+Memory
+
+CPU
+
+Server Count
+
+User Count
+
+Today's Errors
+
+━━━━━━━━━━━━━━━━━━
+
+📋 AUDIT CONFIG
+
+Bot dapat memeriksa konfigurasi.
+
+Contoh:
+
+Welcome
+
+Moderation
+
+Giveaway
+
+Help Center
+
+Link Bypass
+
+System Manager
+
+Jika ada konfigurasi yang belum lengkap.
+
+Tampilkan statusnya.
+
+Contoh:
+
+✅ Ready
+
+⚠️ Incomplete
+
+❌ Missing Configuration
+
+━━━━━━━━━━━━━━━━━━
+
+⚙️ ADVANCED
+
+Gunakan Dropdown.
+
+Minimal:
+
+Debug Mode
+
+Retry Limit
+
+Default Timeout
+
+Maintenance Mode
+
+━━━━━━━━━━━━━━━━━━
+
+DESAIN
+
+Prioritaskan:
+
+• Dropdown
+
+• Modal
+
+• Edit Embed
+
+• Channel Select
+
+• Role Select
+
+Gunakan Button hanya jika benar-benar diperlukan.
+
+━━━━━━━━━━━━━━━━━━
+
+PENTING
+
+System Manager merupakan Core Module.
+
+Nantinya seluruh fitur baru wajib menggunakan:
+
+• Error System
+
+• System Logs
+
+• Backup
+
+Jangan implementasikan khusus untuk satu fitur saja.
+
+Buat agar dapat digunakan oleh semua fitur sekarang maupun fitur yang akan datang.
+
+━━━━━━━━━━━━━━━━━━
+
+PENYELESAIAN
+
+Jangan menyatakan selesai sebelum:
+
+✓ Setup berjalan.
+
+✓ Dropdown berjalan.
+
+✓ Error System siap dipakai semua fitur.
+
+✓ System Logs berjalan.
+
+✓ Backup berjalan.
+
+✓ Audit berjalan.
+
+✓ Tidak ada Runtime Error.
+
+✓ Tidak ada Import Error.
+
+✓ Tidak ada Promise Rejection.
+
+✓ Tidak mengubah fitur lain.
