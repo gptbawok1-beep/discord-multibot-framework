@@ -487,7 +487,7 @@ const plugin = {
       if (!ms) {
         return interaction.update({
           embeds: [buildErrorEmbed('Durasi tidak valid. Silakan pilih ulang.')],
-          components: [buildWizardBackRow('gw_cancel')],
+          components: [buildWizardCancelRow()],
         });
       }
       setDraft(session, { durationMs: ms, durationLabel: val });
@@ -567,7 +567,7 @@ const plugin = {
       if (!draft.prize || !draft.durationMs || !draft.channelId) {
         return interaction.update({
           embeds: [buildErrorEmbed('Data wizard tidak lengkap. Mulai ulang dari menu.')],
-          components: [buildWizardBackRow('gw_cancel')],
+          components: [buildWizardCancelRow()],
         });
       }
 
@@ -614,7 +614,7 @@ const plugin = {
         const errEmbed = buildErrorEmbed(`Gagal membuat giveaway: ${err.message}`);
         return interaction.editReply({
           embeds:     [errEmbed],
-          components: [buildWizardBackRow('gw_cancel')],
+          components: [buildWizardCancelRow()],
         });
       }
     }
@@ -684,7 +684,7 @@ function showDurationStep(interaction, session) {
     embeds:     [embed],
     components: [
       new ActionRowBuilder().addComponents(select),
-      buildWizardBackRow('gw_cancel'),
+      buildWizardCancelRow(),
     ],
   });
 }
@@ -885,9 +885,14 @@ function buildRoleSelectPage(title, description, customId, backId) {
 }
 
 // ---------------------------------------------------------------------------
-// Local helper: wizard back/cancel row
+// Local helpers: wizard navigation rows
 // ---------------------------------------------------------------------------
 
+/**
+ * Row with a Back button AND a Cancel button.
+ * backActionId MUST NOT be 'gw_cancel' — that would produce duplicate custom IDs.
+ * For steps where there is no valid "back" target, use buildWizardCancelRow() instead.
+ */
 function buildWizardBackRow(backActionId) {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
@@ -896,6 +901,19 @@ function buildWizardBackRow(backActionId) {
     new ButtonBuilder()
       .setCustomId('setup1:giveaway:gw_cancel')
       .setLabel('Batal').setEmoji('✖️').setStyle(ButtonStyle.Danger),
+  );
+}
+
+/**
+ * Row with only a Cancel button.
+ * Use this when there is no valid "back" step (e.g. step 2 after the modal,
+ * or error states where the only recovery is to restart the wizard).
+ */
+function buildWizardCancelRow() {
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId('setup1:giveaway:gw_cancel')
+      .setLabel('Batal / Kembali ke Menu').setEmoji('✖️').setStyle(ButtonStyle.Danger),
   );
 }
 
