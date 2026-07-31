@@ -12,6 +12,7 @@ import {
   resolveTarget,
 } from '../../../features/moderation/permCheck.js';
 import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { sendModLog } from '../../../features/moderation/modLogger.js';
 import { PermissionFlagsBits } from 'discord.js';
 
 export default class UnmuteCommand extends BaseCommand {
@@ -68,6 +69,8 @@ export default class UnmuteCommand extends BaseCommand {
         embeds: [errorEmbed('Unmute Gagal', `❌ Tidak bisa unmute member ini.\n\`${err.message}\``)],
       });
     }
+
+    void sendModLog(message, 'unmute', { target: user });
 
     return message.reply({
       embeds: [successEmbed('Member Di-unmute', `🔊 Timeout **${user.tag}** berhasil dihapus.`)],

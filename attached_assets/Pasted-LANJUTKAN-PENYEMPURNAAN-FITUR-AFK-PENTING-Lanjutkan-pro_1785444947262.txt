@@ -1,0 +1,189 @@
+LANJUTKAN PENYEMPURNAAN FITUR AFK
+
+PENTING
+
+Lanjutkan project yang sudah ada.
+
+JANGAN membuat project baru.
+JANGAN mengubah Shared Core.
+JANGAN mengubah Setup Engine.
+JANGAN mengubah Prefix Handler.
+JANGAN mengubah struktur project.
+JANGAN menghapus fitur AFK yang sudah berjalan.
+
+Fokus hanya menyempurnakan User Experience (UX) pada fitur AFK.
+
+━━━━━━━━━━━━━━━━━━
+
+AFK AKTIF
+
+Saat user menjalankan:
+
+!afk
+atau
+!afk <alasan>
+
+Jangan mengubah sistem AFK yang sudah ada.
+
+Hanya ubah tampilan respon.
+
+Gunakan tampilan sederhana:
+
+👀 Kemana nih?
+
+📝 <alasan>
+
+Contoh:
+
+👀 Kemana nih?
+
+📝 Berak
+
+atau
+
+👀 Kemana nih?
+
+📝 Sholat Maghrib
+
+Jika user tidak memberikan alasan:
+
+👀 Kemana nih?
+
+📝 Tanpa alasan
+
+Pesan ini harus otomatis terhapus setelah 30 detik.
+
+Jika bot tidak memiliki izin menghapus pesan:
+Jangan error.
+Abaikan secara aman menggunakan try/catch.
+
+━━━━━━━━━━━━━━━━━━
+
+AFK SELESAI
+
+Saat user mengirim pesan pertama setelah AFK berakhir.
+
+Jika alasan AFK adalah alasan biasa:
+
+😴 Udah kelar AFK-nya?
+
+💤 <durasi> • <alasan>
+
+Contoh:
+
+😴 Udah kelar AFK-nya?
+
+💤 35 menit • Berak
+
+Pesan ini juga otomatis terhapus setelah 30 detik.
+
+━━━━━━━━━━━━━━━━━━
+
+AFK KHUSUS (IBADAH)
+
+Tambahkan deteksi kata kunci.
+
+Jika alasan AFK mengandung salah satu kata berikut (case-insensitive):
+
+sholat
+salat
+jumatan
+jumat
+ngaji
+mengaji
+pengajian
+kajian
+tadarus
+tarawih
+tahajud
+dhuha
+subuh
+dzuhur
+zuhur
+ashar
+maghrib
+isya
+masjid
+umrah
+haji
+
+Saat AFK selesai jangan gunakan pesan default.
+
+Gunakan:
+
+👀 Ehem... calon ustaz balik nih.
+
+💤 <durasi> • <alasan>
+
+Contoh:
+
+👀 Ehem... calon ustaz balik nih.
+
+💤 24 menit • Sholat Maghrib
+
+Pesan juga otomatis terhapus setelah 30 detik.
+
+━━━━━━━━━━━━━━━━━━
+
+MENTION AFK
+
+Jangan ubah sistem mention AFK yang sudah ada.
+
+Tetap tampilkan:
+
+💤 User sedang AFK
+
+📝 Alasan
+
+⏱️ Durasi
+
+Tetap gunakan Anti Spam.
+
+Tambahkan Auto Delete 30 detik.
+
+━━━━━━━━━━━━━━━━━━
+
+VALIDATION
+
+Gunakan sistem AFK yang sudah ada.
+
+Jangan mengubah:
+- Penyimpanan AFK
+- Persistent Config
+- Auto Recovery
+- Cooldown
+- Anti Spam
+- Reply System
+
+Hanya ubah tampilan respon.
+
+━━━━━━━━━━━━━━━━━━
+
+ERROR HANDLING
+
+Gunakan try/catch.
+
+Tidak boleh ada:
+
+Unhandled Promise
+Runtime Error
+Import Error
+
+Jika Auto Delete gagal karena permission:
+
+Abaikan tanpa menghentikan command.
+
+━━━━━━━━━━━━━━━━━━
+
+KOMPATIBILITAS
+
+Pastikan tetap kompatibel dengan:
+
+- Moderation
+- Prefix Loader
+- Shared Storage
+- Auto Recovery
+- Persistent Config
+- Permission System
+
+Jangan mengubah API internal maupun struktur project.

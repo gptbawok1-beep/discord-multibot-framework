@@ -15,6 +15,7 @@ import {
 } from '../../../features/moderation/permCheck.js';
 import { loadGuildConfig } from '../../../setup/config.js';
 import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { sendModLog } from '../../../features/moderation/modLogger.js';
 import { PermissionFlagsBits } from 'discord.js';
 
 export default class KickCommand extends BaseCommand {
@@ -103,6 +104,8 @@ export default class KickCommand extends BaseCommand {
         embeds: [errorEmbed('Kick Gagal', `❌ Tidak bisa kick member ini.\n\`${err.message}\``)],
       });
     }
+
+    void sendModLog(message, 'kick', { target: user, reason });
 
     return message.reply({
       embeds: [successEmbed('Member Di-kick', `👢 **${user.tag}** berhasil di-kick.\n**Alasan:** ${reason}`)],

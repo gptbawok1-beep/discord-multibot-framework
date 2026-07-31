@@ -19,6 +19,7 @@ import {
 } from '../../../features/moderation/permCheck.js';
 import { loadGuildConfig } from '../../../setup/config.js';
 import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { sendModLog } from '../../../features/moderation/modLogger.js';
 import { PermissionFlagsBits } from 'discord.js';
 
 export default class MuteCommand extends BaseCommand {
@@ -125,6 +126,8 @@ export default class MuteCommand extends BaseCommand {
         embeds: [errorEmbed('Mute Gagal', `❌ Tidak bisa mute member ini.\n\`${err.message}\``)],
       });
     }
+
+    void sendModLog(message, 'mute', { target: user, reason, duration: formatDuration(ms) });
 
     return message.reply({
       embeds: [successEmbed('Member Di-mute',

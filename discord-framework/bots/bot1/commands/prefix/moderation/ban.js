@@ -15,6 +15,7 @@ import {
 } from '../../../features/moderation/permCheck.js';
 import { loadGuildConfig } from '../../../setup/config.js';
 import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { sendModLog } from '../../../features/moderation/modLogger.js';
 import { PermissionFlagsBits } from 'discord.js';
 
 export default class BanCommand extends BaseCommand {
@@ -104,6 +105,8 @@ export default class BanCommand extends BaseCommand {
         embeds: [errorEmbed('Ban Gagal', `❌ Tidak bisa ban user ini.\n\`${err.message}\``)],
       });
     }
+
+    void sendModLog(message, 'ban', { target: user, reason });
 
     return message.reply({
       embeds: [successEmbed('Member Di-ban', `🔨 **${user.tag}** berhasil di-ban.\n**Alasan:** ${reason}`)],

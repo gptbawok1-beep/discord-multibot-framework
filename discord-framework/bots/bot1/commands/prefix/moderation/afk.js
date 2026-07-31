@@ -3,12 +3,14 @@
  *
  * Mengaktifkan status AFK untuk pengguna.
  * Status otomatis dihapus saat pengguna mengirim pesan.
- * Saat pengguna di-mention, bot membalas dengan info AFK mereka.
+ * Respons bot otomatis terhapus setelah 30 detik.
  */
 
 import { BaseCommand } from '../../../../../shared/structures/index.js';
 import { loadGuildConfig, updateSection } from '../../../setup/config.js';
-import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { EmbedBuilder } from 'discord.js';
+
+const AUTO_DELETE_MS = 30_000;
 
 export default class AfkCommand extends BaseCommand {
   constructor() {
@@ -28,14 +30,10 @@ export default class AfkCommand extends BaseCommand {
     try {
       cfg = await loadGuildConfig(message.guild.id);
     } catch {
-      return message.reply({ embeds: [errorEmbed('Error', '❌ Tidak bisa memuat konfigurasi server.')] });
+      return message.reply({ content: '❌ Tidak bisa memuat konfigurasi server.' });
     }
 
     const afkUsers = cfg.afk?.users ?? {};
-
-    // If already AFK, update reason
-    const alreadyAfk = !!afkUsers[message.author.id];
-
     const newUsers = {
       ...afkUsers,
       [message.author.id]: {
@@ -47,15 +45,20 @@ export default class AfkCommand extends BaseCommand {
     try {
       await updateSection(message.guild.id, 'afk', { users: newUsers });
     } catch {
-      return message.reply({ embeds: [errorEmbed('Error', '❌ Tidak bisa menyimpan status AFK.')] });
+      return message.reply({ content: '❌ Tidak bisa menyimpan status AFK.' });
     }
 
-    const desc = reason
-      ? `💤 **${message.author.username}** sekarang AFK.\n**Alasan:** ${reason}`
-      : `💤 **${message.author.username}** sekarang AFK.`;
+    const displayReason = reason ?? 'Tanpa alasan';
 
-    return message.reply({
-      embeds: [successEmbed(alreadyAfk ? 'AFK Diperbarui' : 'AFK Aktif', desc)],
-    });
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setDescription(`👀 **Kemana nih?**\n📝 ${displayReason}`);
+
+    const reply = await message.reply({ embeds: [embed] }).catch(() => null);
+
+    // Auto-delete bot reply setelah 30 detik
+    if (reply) {
+      setTimeout(() => reply.delete().catch(() => null), AUTO_DELETE_MS);
+    }
   }
 }

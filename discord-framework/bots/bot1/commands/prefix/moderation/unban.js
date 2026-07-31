@@ -8,6 +8,7 @@
 import { BaseCommand } from '../../../../../shared/structures/index.js';
 import { checkModPermission } from '../../../features/moderation/permCheck.js';
 import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { sendModLog } from '../../../features/moderation/modLogger.js';
 import { PermissionFlagsBits } from 'discord.js';
 
 export default class UnbanCommand extends BaseCommand {
@@ -63,6 +64,8 @@ export default class UnbanCommand extends BaseCommand {
     }
 
     const user = banEntry.user;
+    void sendModLog(message, 'unban', { target: user, reason });
+
     return message.reply({
       embeds: [successEmbed('Ban Dicabut', `🔓 **${user.tag}** berhasil di-unban.\n**Alasan:** ${reason}`)],
     });

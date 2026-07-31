@@ -8,6 +8,7 @@
 import { BaseCommand } from '../../../../../shared/structures/index.js';
 import { checkModPermission } from '../../../features/moderation/permCheck.js';
 import { errorEmbed, successEmbed } from '../../../../../shared/utils/embed.js';
+import { sendModLog } from '../../../features/moderation/modLogger.js';
 import { PermissionFlagsBits } from 'discord.js';
 
 const MAX_BULK_DELETE = 100;   // Discord API limit per call
@@ -99,6 +100,8 @@ export default class CcCommand extends BaseCommand {
     if (tooOldCount > 0) {
       desc += `\n⚠️ **${tooOldCount}** pesan tidak bisa dihapus karena lebih dari 14 hari.`;
     }
+
+    void sendModLog(message, 'clear', { count: totalDeleted });
 
     const feedback = await message.channel.send({
       embeds: [successEmbed('Pesan Dihapus', desc)],
