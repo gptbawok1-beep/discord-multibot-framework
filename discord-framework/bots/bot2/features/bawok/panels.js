@@ -6,6 +6,7 @@
  *
  * Banner is fetched once at startup and attached as a local file so Discord
  * never has to proxy the external URL (avoids hotlink/CDN failures).
+ * Banner is shown only on the Home panel.
  */
 
 import {
@@ -20,21 +21,64 @@ import {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const BANNER_URL  = 'https://litter.catbox.moe/nv0463jzrv68x321.png';
-const BANNER_NAME = 'banner.png';
-const BANNER_REF  = `attachment://${BANNER_NAME}`;
+const BANNER_URL     = 'https://litter.catbox.moe/nv0463jzrv68x321.png';
+const BANNER_NAME    = 'banner.png';
+const BANNER_REF     = `attachment://${BANNER_NAME}`;
 
-const COLOR_PANEL  = 0x111111;
-const FOOTER_TEXT  = '🩸 Kenyut';
-const SELECT_ID    = 'bawok_module_select';
-const BUTTON_BACK_ID = 'bawok_back_home';
+const FOOTER_TEXT    = '🩸 Kenyut';
+export const SELECT_ID       = 'bawok_module_select';
+export const BUTTON_BACK_ID  = 'bawok_back_home';
+export const BUTTON_CLOSE_ID = 'bawok_close_panel';
+
+// ─── Colors ───────────────────────────────────────────────────────────────────
+
+const COLORS = Object.freeze({
+  HOME:            0xDC143C, // Crimson
+  AI_CORE:         0x9B59B6, // Ungu
+  BOOMBOX:         0x3498DB, // Biru
+  SCAN_KEYLOGGER:  0x2ECC71, // Hijau
+  OBFUSCATOR:      0xE67E22, // Orange
+  DEOBFUSCATOR:    0x4A4A4A, // Abu gelap
+});
+
+// ─── Module Definitions ───────────────────────────────────────────────────────
 
 const MODULES = [
-  { value: 'ai_core',        label: 'AI Core',         emoji: '🧠' },
-  { value: 'boombox',        label: 'Boombox',          emoji: '🎵' },
-  { value: 'scan_keylogger', label: 'Scan Keylogger',   emoji: '🛡️' },
-  { value: 'obfuscator',     label: 'Obfuscator',       emoji: '🔒' },
-  { value: 'deobfuscator',   label: 'Deobfuscator',     emoji: '📖' },
+  {
+    value:    'ai_core',
+    label:    'AI Core',
+    subtitle: 'Artificial Intelligence Workspace',
+    emoji:    '🧠',
+    color:    COLORS.AI_CORE,
+  },
+  {
+    value:    'boombox',
+    label:    'Boombox',
+    subtitle: 'Media Download Center',
+    emoji:    '🎵',
+    color:    COLORS.BOOMBOX,
+  },
+  {
+    value:    'scan_keylogger',
+    label:    'Scan Keylogger',
+    subtitle: 'Security Scanner',
+    emoji:    '🛡️',
+    color:    COLORS.SCAN_KEYLOGGER,
+  },
+  {
+    value:    'obfuscator',
+    label:    'Obfuscator',
+    subtitle: 'Code Protection',
+    emoji:    '🔒',
+    color:    COLORS.OBFUSCATOR,
+  },
+  {
+    value:    'deobfuscator',
+    label:    'Deobfuscator',
+    subtitle: 'Code Analyzer',
+    emoji:    '📖',
+    color:    COLORS.DEOBFUSCATOR,
+  },
 ];
 
 // ─── Banner Cache ─────────────────────────────────────────────────────────────
@@ -44,7 +88,7 @@ let _bannerBuffer = null;
 
 /**
  * Fetch and cache the banner image as a Buffer.
- * Falls back to null on network error so the embed still sends without image.
+ * Falls back to null on error — embed still sends, just without image.
  * @returns {Promise<Buffer|null>}
  */
 async function fetchBanner() {
@@ -55,7 +99,7 @@ async function fetchBanner() {
     _bannerBuffer = Buffer.from(await res.arrayBuffer());
     return _bannerBuffer;
   } catch (err) {
-    console.error(`[Bawok] Failed to fetch banner: ${err.message}`);
+    console.error(`[Bawok] Banner fetch failed: ${err.message}`);
     return null;
   }
 }
@@ -64,20 +108,28 @@ async function fetchBanner() {
 
 function buildHomeEmbed(hasBanner) {
   const embed = new EmbedBuilder()
-    .setColor(COLOR_PANEL)
+    .setColor(COLORS.HOME)
     .setDescription('**Selamat datang di Bawok.**\nPilih modul melalui menu di bawah.')
     .setFooter({ text: FOOTER_TEXT });
   if (hasBanner) embed.setImage(BANNER_REF);
   return embed;
 }
 
-function buildModuleEmbed(label, emoji, hasBanner) {
-  const embed = new EmbedBuilder()
-    .setColor(COLOR_PANEL)
-    .setDescription(`**${emoji} ${label}**\n\n🟡 **Development**\nModul ini masih dalam pengembangan.`)
+function buildModuleEmbed(mod) {
+  return new EmbedBuilder()
+    .setColor(mod.color)
+    .setTitle(`${mod.emoji} ${mod.label}`)
+    .setDescription(
+      `${mod.subtitle}\n\n🟡 **Development**\nModul ini masih dalam pengembangan.`
+    )
     .setFooter({ text: FOOTER_TEXT });
-  if (hasBanner) embed.setImage(BANNER_REF);
-  return embed;
+}
+
+function buildClosedEmbed() {
+  return new EmbedBuilder()
+    .setColor(COLORS.HOME)
+    .setDescription('🔒 **Panel Closed**\n\nGunakan `/bawok` untuk membuka kembali.')
+    .setFooter({ text: FOOTER_TEXT });
 }
 
 // ─── Component Builders ───────────────────────────────────────────────────────
@@ -97,19 +149,34 @@ function buildSelectRow() {
   return new ActionRowBuilder().addComponents(select);
 }
 
-function buildBackRow() {
-  const btn = new ButtonBuilder()
-    .setCustomId(BUTTON_BACK_ID)
-    .setLabel('Back Home')
-    .setEmoji('⬅️')
-    .setStyle(ButtonStyle.Secondary);
-  return new ActionRowBuilder().addComponents(btn);
+function buildNavRow(includeBack = false) {
+  const row = new ActionRowBuilder();
+
+  if (includeBack) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId(BUTTON_BACK_ID)
+        .setLabel('Back Home')
+        .setEmoji('⬅️')
+        .setStyle(ButtonStyle.Secondary)
+    );
+  }
+
+  row.addComponents(
+    new ButtonBuilder()
+      .setCustomId(BUTTON_CLOSE_ID)
+      .setLabel('Close Panel')
+      .setEmoji('🔒')
+      .setStyle(ButtonStyle.Danger)
+  );
+
+  return row;
 }
 
 // ─── Payload Helpers ──────────────────────────────────────────────────────────
 
 /**
- * Complete message payload for the home panel.
+ * Home panel payload.
  * @returns {Promise<{ embeds, components, files }>}
  */
 async function homePayload() {
@@ -117,27 +184,36 @@ async function homePayload() {
   const files  = buffer ? [new AttachmentBuilder(buffer, { name: BANNER_NAME })] : [];
   return {
     embeds:     [buildHomeEmbed(!!buffer)],
-    components: [buildSelectRow()],
+    components: [buildSelectRow(), buildNavRow(false)],
     files,
   };
 }
 
 /**
- * Complete message payload for a module's placeholder panel.
+ * Module placeholder payload.
  * @param {string} moduleValue
  * @returns {Promise<{ embeds, components, files }>}
  */
 async function modulePayload(moduleValue) {
-  const mod    = MODULES.find((m) => m.value === moduleValue);
-  const label  = mod?.label ?? 'Unknown';
-  const emoji  = mod?.emoji ?? '❓';
-  const buffer = await fetchBanner();
-  const files  = buffer ? [new AttachmentBuilder(buffer, { name: BANNER_NAME })] : [];
+  const mod = MODULES.find((m) => m.value === moduleValue);
+  if (!mod) return homePayload();
   return {
-    embeds:     [buildModuleEmbed(label, emoji, !!buffer)],
-    components: [buildBackRow()],
-    files,
+    embeds:     [buildModuleEmbed(mod)],
+    components: [buildNavRow(true)],
+    files:      [],
   };
 }
 
-export { SELECT_ID, BUTTON_BACK_ID, homePayload, modulePayload };
+/**
+ * Closed panel payload — no components, no files.
+ * @returns {{ embeds, components, files }}
+ */
+function closedPayload() {
+  return {
+    embeds:     [buildClosedEmbed()],
+    components: [],
+    files:      [],
+  };
+}
+
+export { homePayload, modulePayload, closedPayload };

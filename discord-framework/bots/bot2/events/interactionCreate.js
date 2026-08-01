@@ -4,7 +4,7 @@
  * Routes incoming interactions:
  *   - ChatInputCommand  → shared slash handler
  *   - StringSelectMenu  → bawok module navigation
- *   - Button            → bawok back-home navigation
+ *   - Button            → bawok back-home / close-panel navigation
  */
 
 import { BaseEvent } from '../../../shared/structures/index.js';
@@ -13,8 +13,10 @@ import { createLogger } from '../../../shared/logger/index.js';
 import {
   SELECT_ID,
   BUTTON_BACK_ID,
+  BUTTON_CLOSE_ID,
   homePayload,
   modulePayload,
+  closedPayload,
 } from '../features/bawok/panels.js';
 
 const logger = createLogger('BOT2');
@@ -33,14 +35,19 @@ export default class InteractionCreateEvent extends BaseEvent {
 
     // ── Bawok: module select menu ───────────────────────────────────────────
     if (interaction.isStringSelectMenu() && interaction.customId === SELECT_ID) {
-      const selected = interaction.values[0];
-      await interaction.update(await modulePayload(selected));
+      await interaction.update(await modulePayload(interaction.values[0]));
       return;
     }
 
     // ── Bawok: back-home button ─────────────────────────────────────────────
     if (interaction.isButton() && interaction.customId === BUTTON_BACK_ID) {
       await interaction.update(await homePayload());
+      return;
+    }
+
+    // ── Bawok: close-panel button ───────────────────────────────────────────
+    if (interaction.isButton() && interaction.customId === BUTTON_CLOSE_ID) {
+      await interaction.update(closedPayload());
       return;
     }
   }
