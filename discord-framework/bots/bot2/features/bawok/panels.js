@@ -9,6 +9,9 @@
  * Banner is shown only on the Home panel.
  */
 
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -21,9 +24,10 @@ import {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const BANNER_URL     = 'https://litter.catbox.moe/nv0463jzrv68x321.png';
-const BANNER_NAME    = 'banner.png';
-const BANNER_REF     = `attachment://${BANNER_NAME}`;
+const __dirname   = dirname(fileURLToPath(import.meta.url));
+const BANNER_PATH = join(__dirname, '../../../../assets/bawok-banner.png');
+const BANNER_NAME = 'banner.png';
+const BANNER_REF  = `attachment://${BANNER_NAME}`;
 
 const FOOTER_TEXT    = '🩸 Kenyut';
 export const SELECT_ID       = 'bawok_module_select';
@@ -81,25 +85,17 @@ const MODULES = [
   },
 ];
 
-// ─── Banner Cache ─────────────────────────────────────────────────────────────
+// ─── Banner (loaded once from local file) ────────────────────────────────────
 
-/** @type {Buffer|null} */
 let _bannerBuffer = null;
 
-/**
- * Fetch and cache the banner image as a Buffer.
- * Falls back to null on error — embed still sends, just without image.
- * @returns {Promise<Buffer|null>}
- */
-async function fetchBanner() {
+function getBanner() {
   if (_bannerBuffer) return _bannerBuffer;
   try {
-    const res = await fetch(BANNER_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    _bannerBuffer = Buffer.from(await res.arrayBuffer());
+    _bannerBuffer = readFileSync(BANNER_PATH);
     return _bannerBuffer;
   } catch (err) {
-    console.error(`[Bawok] Banner fetch failed: ${err.message}`);
+    console.error(`[Bawok] Banner load failed: ${err.message}`);
     return null;
   }
 }
@@ -177,10 +173,10 @@ function buildNavRow(includeBack = false) {
 
 /**
  * Home panel payload.
- * @returns {Promise<{ embeds, components, files }>}
+ * @returns {{ embeds, components, files }}
  */
-async function homePayload() {
-  const buffer = await fetchBanner();
+function homePayload() {
+  const buffer = getBanner();
   const files  = buffer ? [new AttachmentBuilder(buffer, { name: BANNER_NAME })] : [];
   return {
     embeds:     [buildHomeEmbed(!!buffer)],
@@ -192,9 +188,9 @@ async function homePayload() {
 /**
  * Module placeholder payload.
  * @param {string} moduleValue
- * @returns {Promise<{ embeds, components, files }>}
+ * @returns {{ embeds, components, files }}
  */
-async function modulePayload(moduleValue) {
+function modulePayload(moduleValue) {
   const mod = MODULES.find((m) => m.value === moduleValue);
   if (!mod) return homePayload();
   return {

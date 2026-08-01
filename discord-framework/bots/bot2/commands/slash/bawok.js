@@ -23,6 +23,6 @@ export default class BawokCommand extends BaseCommand {
   }
 
   async execute(_client, interaction) {
-    await interaction.reply(await homePayload());
+    await interaction.reply(homePayload());
   }
 }
