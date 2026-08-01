@@ -1,0 +1,327 @@
+BOT 2 - BOOMBOX ENGINE V2 (FOUNDATION)
+
+PENTING
+
+Jangan ubah Bot 1.
+
+Jangan membuat Discord Music Bot.
+
+Jangan membuat sistem download lalu mengirim MP3 ke Discord.
+
+Tujuan Boombox adalah:
+
+Mengubah link YouTube, TikTok, atau Spotify menjadi URL audio yang dapat digunakan pada GTA SA:MP Boombox.
+
+====================================================
+
+TARGET
+
+Bangun sistem profesional.
+
+Prioritas:
+
+✔ Cepat
+✔ Stabil
+✔ Modular
+✔ Mudah dikembangkan
+✔ Mudah maintenance
+✔ Banyak user dapat menggunakan bersamaan
+✔ Tidak ada proses yang membuat worker lain berhenti
+✔ UI mengikuti Bot 2
+
+====================================================
+
+PHASE 1
+
+Bangun struktur berikut.
+
+src/features/boombox/
+
+manager.js
+router.js
+queue.js
+workers.js
+cache.js
+database.js
+validator.js
+logger.js
+monitoring.js
+analytics.js
+settings.js
+retry.js
+cleanup.js
+
+providers/
+
+youtube.js
+tiktok.js
+spotify.js
+
+uploaders/
+
+top4top.js
+
+====================================================
+
+FLOW
+
+User
+↓
+
+Validator
+
+↓
+
+Queue Manager
+
+↓
+
+Cache Manager
+
+↓
+
+Database
+
+↓
+
+Jika cache ditemukan
+
+↓
+
+langsung kirim URL
+
+Jika tidak ditemukan
+
+↓
+
+Provider
+
+↓
+
+Uploader
+
+↓
+
+Simpan Database
+
+↓
+
+Simpan Cache
+
+↓
+
+Kirim URL
+
+====================================================
+
+QUEUE
+
+Gunakan Queue Manager.
+
+Request baru tidak boleh menghentikan request lain.
+
+Worker dipisahkan dari Queue.
+
+Worker gagal tidak boleh membuat Worker lain berhenti.
+
+====================================================
+
+CACHE
+
+Gunakan Video ID atau identitas unik.
+
+Jika URL pernah diproses:
+
+langsung gunakan URL hasil.
+
+Jangan convert ulang.
+
+====================================================
+
+DATABASE
+
+Simpan:
+
+Video ID
+
+Platform
+
+Title
+
+Duration
+
+Upload URL
+
+Upload Time
+
+Status
+
+Use Count
+
+Last Used
+
+====================================================
+
+RETRY
+
+Command
+
+!requlang
+
+Semua user dapat menggunakan.
+
+Fungsi:
+
+cek database
+
+cek cache
+
+jika file rusak
+
+hapus cache lama
+
+proses ulang
+
+update database
+
+kirim URL baru
+
+====================================================
+
+AUTO CLEANUP
+
+Buat Cleanup Manager.
+
+Hapus cache lama yang sudah melewati batas waktu atau tidak pernah dipakai lagi.
+
+Jangan menghapus database.
+
+====================================================
+
+ANALYTICS
+
+Siapkan placeholder.
+
+Downloads
+
+Cache Hit
+
+Cache Miss
+
+Queue Count
+
+Retry Count
+
+Platform Usage
+
+====================================================
+
+MONITORING
+
+Siapkan placeholder.
+
+Queue
+
+Worker
+
+Cache
+
+Uploader
+
+Database
+
+Retry
+
+Error
+
+====================================================
+
+SETTINGS
+
+Placeholder.
+
+Channel Mode
+
+○ Combined
+
+○ Separate
+
+Siapkan agar nanti dapat memilih channel berbeda untuk:
+
+YouTube
+
+TikTok
+
+Spotify
+
+Logs
+
+Errors
+
+====================================================
+
+LOGGER
+
+Simpan log:
+
+Processing
+
+Completed
+
+Failed
+
+Retry
+
+Cleanup
+
+====================================================
+
+UPLOADER
+
+Jangan hardcode ke seluruh project.
+
+Semua proses upload harus melalui uploaders/top4top.js.
+
+Jika suatu saat uploader diganti, cukup mengganti folder uploaders.
+
+====================================================
+
+PROVIDER
+
+Pisahkan setiap platform.
+
+providers/youtube.js
+
+providers/tiktok.js
+
+providers/spotify.js
+
+Jangan gabungkan semua platform dalam satu file.
+
+====================================================
+
+UI
+
+Ikuti UI Bot 2.
+
+Embed sesuai warna modul.
+
+Footer:
+
+🩸 Kenyut
+
+Gunakan:
+
+⬅ Back Home
+
+🔒 Close Panel
+
+Semua menggunakan Edit Message.
+
+====================================================
+
+PHASE 1 HANYA MEMBANGUN PONDASI.
+
+Jangan implementasi proses convert, upload, atau provider secara penuh.
+
+Pastikan seluruh struktur sudah siap agar Phase 2 tinggal mengisi logika tanpa mengubah arsitektur.

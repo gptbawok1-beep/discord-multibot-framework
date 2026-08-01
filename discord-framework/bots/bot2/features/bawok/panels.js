@@ -12,14 +12,20 @@ import {
   StringSelectMenuOptionBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from 'discord.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FOOTER_TEXT    = '🩸 Kenyut';
-export const SELECT_ID       = 'bawok_module_select';
-export const BUTTON_BACK_ID  = 'bawok_back_home';
-export const BUTTON_CLOSE_ID = 'bawok_close_panel';
+export const SELECT_ID            = 'bawok_module_select';
+export const BUTTON_BACK_ID       = 'bawok_back_home';
+export const BUTTON_CLOSE_ID      = 'bawok_close_panel';
+export const BUTTON_BOOMBOX_URL   = 'boombox_enter_url';
+export const MODAL_BOOMBOX_ID     = 'boombox_url_modal';
+export const MODAL_BOOMBOX_INPUT  = 'boombox_url_input';
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
@@ -117,11 +123,58 @@ function homePayload() {
 function modulePayload(moduleValue) {
   const mod = MODULES.find((m) => m.value === moduleValue);
   if (!mod) return homePayload();
+  // Boombox gets its own panel with a URL input button
+  if (mod.value === 'boombox') return boomboxModulePayload(mod);
   return {
     embeds:     [buildModuleEmbed(mod)],
     components: [buildNavRow(true)],
     files:      [],
   };
+}
+
+function boomboxModulePayload(mod = MODULES.find((m) => m.value === 'boombox')) {
+  const embed = new EmbedBuilder()
+    .setColor(mod.color)
+    .setTitle(`${mod.emoji} ${mod.label}`)
+    .setDescription(
+      `${mod.subtitle}\n\n` +
+      `Kirim link **YouTube**, **TikTok**, atau **Spotify** untuk mendapatkan URL audio SA:MP Boombox.\n\n` +
+      `> Tekan **🔗 Masukkan Link** lalu tempel URL-mu.`
+    )
+    .setFooter({ text: FOOTER_TEXT });
+
+  const urlBtn = new ButtonBuilder()
+    .setCustomId(BUTTON_BOOMBOX_URL)
+    .setLabel('Masukkan Link')
+    .setEmoji('🔗')
+    .setStyle(ButtonStyle.Primary);
+
+  const actionRow = new ActionRowBuilder().addComponents(urlBtn);
+
+  return {
+    embeds:     [embed],
+    components: [actionRow, buildNavRow(true)],
+    files:      [],
+  };
+}
+
+/**
+ * Build the Boombox URL input modal.
+ * @returns {ModalBuilder}
+ */
+function buildBoomboxModal() {
+  const input = new TextInputBuilder()
+    .setCustomId(MODAL_BOOMBOX_INPUT)
+    .setLabel('YouTube / TikTok / Spotify URL')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('https://youtu.be/...')
+    .setRequired(true)
+    .setMaxLength(512);
+
+  return new ModalBuilder()
+    .setCustomId(MODAL_BOOMBOX_ID)
+    .setTitle('🎵 Boombox — Masukkan Link')
+    .addComponents(new ActionRowBuilder().addComponents(input));
 }
 
 function closedPayload() {
@@ -132,4 +185,4 @@ function closedPayload() {
   };
 }
 
-export { homePayload, modulePayload, closedPayload };
+export { homePayload, modulePayload, closedPayload, buildBoomboxModal };
