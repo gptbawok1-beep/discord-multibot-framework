@@ -138,6 +138,46 @@ Routed in `bots/bot1/events/interactionCreate.js` → `handleGiveawayInteraction
 - Timers are rescheduled from persistent `endsAt` timestamps.
 - Giveaways past their end time are ended automatically on recovery.
 
+## Bot 2 — Bawok Panel (/bawok)
+
+Single-embed navigation panel for Bot 2. Uses edit-in-place (no new messages).
+
+### Command
+`/bawok` — opens the Bawok home panel.
+
+### Navigation flow
+```
+/bawok → Home embed + module dropdown
+  └── Select module → placeholder embed + ⬅️ Back Home button
+        └── Back Home → home embed (edit-in-place)
+```
+
+### Modules (all placeholder — development stage)
+- 🧠 AI Core
+- 🎵 Boombox
+- 🛡️ Scan Keylogger
+- 🔒 Obfuscator
+- 📖 Deobfuscator
+
+### Files
+```
+bots/bot2/
+  features/bawok/panels.js        — embed + component builders, payload helpers
+  commands/slash/bawok.js         — /bawok slash command
+  events/interactionCreate.js     — routes bawok_module_select + bawok_back_home
+```
+
+### Deploy slash commands for Bot 2
+```bash
+cd discord-framework && GUILD_ID=your_guild_id node bots/bot2/deploy-commands.js
+```
+
+### Custom IDs
+- Select menu: `bawok_module_select`
+- Back Home button: `bawok_back_home`
+
+---
+
 ## User preferences
 
 - Language: Bahasa Indonesia for UI strings in Discord embeds, English for code comments.
