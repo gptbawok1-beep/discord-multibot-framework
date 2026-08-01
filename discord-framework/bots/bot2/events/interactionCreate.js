@@ -48,6 +48,7 @@ export default class InteractionCreateEvent extends BaseEvent {
     // ── Bawok: close-panel button ───────────────────────────────────────────
     if (interaction.isButton() && interaction.customId === BUTTON_CLOSE_ID) {
       await interaction.update(closedPayload());
+      setTimeout(() => interaction.deleteReply().catch(() => {}), 5000);
       return;
     }
   }
