@@ -3,15 +3,8 @@
  *
  * Builds embeds and components for the /bawok command UI.
  * All navigation uses edit-in-place (no new messages).
- *
- * Banner is fetched once at startup and attached as a local file so Discord
- * never has to proxy the external URL (avoids hotlink/CDN failures).
- * Banner is shown only on the Home panel.
  */
 
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -19,15 +12,9 @@ import {
   StringSelectMenuOptionBuilder,
   ButtonBuilder,
   ButtonStyle,
-  AttachmentBuilder,
 } from 'discord.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const __dirname   = dirname(fileURLToPath(import.meta.url));
-const BANNER_PATH = join(__dirname, '../../../../assets/bawok-banner.png');
-const BANNER_NAME = 'banner.png';
-const BANNER_REF  = `attachment://${BANNER_NAME}`;
 
 const FOOTER_TEXT    = '🩸 Kenyut';
 export const SELECT_ID       = 'bawok_module_select';
@@ -37,87 +24,38 @@ export const BUTTON_CLOSE_ID = 'bawok_close_panel';
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
 const COLORS = Object.freeze({
-  HOME:            0xDC143C, // Crimson
-  AI_CORE:         0x9B59B6, // Ungu
-  BOOMBOX:         0x3498DB, // Biru
-  SCAN_KEYLOGGER:  0x2ECC71, // Hijau
-  OBFUSCATOR:      0xE67E22, // Orange
-  DEOBFUSCATOR:    0x4A4A4A, // Abu gelap
+  HOME:           0xDC143C,
+  AI_CORE:        0x9B59B6,
+  BOOMBOX:        0x3498DB,
+  SCAN_KEYLOGGER: 0x2ECC71,
+  OBFUSCATOR:     0xE67E22,
+  DEOBFUSCATOR:   0x4A4A4A,
 });
 
 // ─── Module Definitions ───────────────────────────────────────────────────────
 
 const MODULES = [
-  {
-    value:    'ai_core',
-    label:    'AI Core',
-    subtitle: 'Artificial Intelligence Workspace',
-    emoji:    '🧠',
-    color:    COLORS.AI_CORE,
-  },
-  {
-    value:    'boombox',
-    label:    'Boombox',
-    subtitle: 'Media Download Center',
-    emoji:    '🎵',
-    color:    COLORS.BOOMBOX,
-  },
-  {
-    value:    'scan_keylogger',
-    label:    'Scan Keylogger',
-    subtitle: 'Security Scanner',
-    emoji:    '🛡️',
-    color:    COLORS.SCAN_KEYLOGGER,
-  },
-  {
-    value:    'obfuscator',
-    label:    'Obfuscator',
-    subtitle: 'Code Protection',
-    emoji:    '🔒',
-    color:    COLORS.OBFUSCATOR,
-  },
-  {
-    value:    'deobfuscator',
-    label:    'Deobfuscator',
-    subtitle: 'Code Analyzer',
-    emoji:    '📖',
-    color:    COLORS.DEOBFUSCATOR,
-  },
+  { value: 'ai_core',        label: 'AI Core',       subtitle: 'Artificial Intelligence Workspace', emoji: '🧠', color: COLORS.AI_CORE },
+  { value: 'boombox',        label: 'Boombox',        subtitle: 'Media Download Center',            emoji: '🎵', color: COLORS.BOOMBOX },
+  { value: 'scan_keylogger', label: 'Scan Keylogger', subtitle: 'Security Scanner',                 emoji: '🛡️', color: COLORS.SCAN_KEYLOGGER },
+  { value: 'obfuscator',     label: 'Obfuscator',     subtitle: 'Code Protection',                  emoji: '🔒', color: COLORS.OBFUSCATOR },
+  { value: 'deobfuscator',   label: 'Deobfuscator',   subtitle: 'Code Analyzer',                    emoji: '📖', color: COLORS.DEOBFUSCATOR },
 ];
-
-// ─── Banner (loaded once from local file) ────────────────────────────────────
-
-let _bannerBuffer = null;
-
-function getBanner() {
-  if (_bannerBuffer) return _bannerBuffer;
-  try {
-    _bannerBuffer = readFileSync(BANNER_PATH);
-    return _bannerBuffer;
-  } catch (err) {
-    console.error(`[Bawok] Banner load failed: ${err.message}`);
-    return null;
-  }
-}
 
 // ─── Embed Builders ───────────────────────────────────────────────────────────
 
-function buildHomeEmbed(hasBanner) {
-  const embed = new EmbedBuilder()
+function buildHomeEmbed() {
+  return new EmbedBuilder()
     .setColor(COLORS.HOME)
     .setDescription('**Selamat datang di Bawok.**\nPilih modul melalui menu di bawah.')
     .setFooter({ text: FOOTER_TEXT });
-  if (hasBanner) embed.setImage(BANNER_REF);
-  return embed;
 }
 
 function buildModuleEmbed(mod) {
   return new EmbedBuilder()
     .setColor(mod.color)
     .setTitle(`${mod.emoji} ${mod.label}`)
-    .setDescription(
-      `${mod.subtitle}\n\n🟡 **Development**\nModul ini masih dalam pengembangan.`
-    )
+    .setDescription(`${mod.subtitle}\n\n🟡 **Development**\nModul ini masih dalam pengembangan.`)
     .setFooter({ text: FOOTER_TEXT });
 }
 
@@ -147,7 +85,6 @@ function buildSelectRow() {
 
 function buildNavRow(includeBack = false) {
   const row = new ActionRowBuilder();
-
   if (includeBack) {
     row.addComponents(
       new ButtonBuilder()
@@ -157,7 +94,6 @@ function buildNavRow(includeBack = false) {
         .setStyle(ButtonStyle.Secondary)
     );
   }
-
   row.addComponents(
     new ButtonBuilder()
       .setCustomId(BUTTON_CLOSE_ID)
@@ -165,31 +101,19 @@ function buildNavRow(includeBack = false) {
       .setEmoji('🔒')
       .setStyle(ButtonStyle.Danger)
   );
-
   return row;
 }
 
 // ─── Payload Helpers ──────────────────────────────────────────────────────────
 
-/**
- * Home panel payload.
- * @returns {{ embeds, components, files }}
- */
 function homePayload() {
-  const buffer = getBanner();
-  const files  = buffer ? [new AttachmentBuilder(buffer, { name: BANNER_NAME })] : [];
   return {
-    embeds:     [buildHomeEmbed(!!buffer)],
+    embeds:     [buildHomeEmbed()],
     components: [buildSelectRow(), buildNavRow(false)],
-    files,
+    files:      [],
   };
 }
 
-/**
- * Module placeholder payload.
- * @param {string} moduleValue
- * @returns {{ embeds, components, files }}
- */
 function modulePayload(moduleValue) {
   const mod = MODULES.find((m) => m.value === moduleValue);
   if (!mod) return homePayload();
@@ -200,10 +124,6 @@ function modulePayload(moduleValue) {
   };
 }
 
-/**
- * Closed panel payload — no components, no files.
- * @returns {{ embeds, components, files }}
- */
 function closedPayload() {
   return {
     embeds:     [buildClosedEmbed()],
