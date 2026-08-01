@@ -34,13 +34,13 @@ export default class InteractionCreateEvent extends BaseEvent {
     // ── Bawok: module select menu ───────────────────────────────────────────
     if (interaction.isStringSelectMenu() && interaction.customId === SELECT_ID) {
       const selected = interaction.values[0];
-      await interaction.update(modulePayload(selected));
+      await interaction.update(await modulePayload(selected));
       return;
     }
 
     // ── Bawok: back-home button ─────────────────────────────────────────────
     if (interaction.isButton() && interaction.customId === BUTTON_BACK_ID) {
-      await interaction.update(homePayload());
+      await interaction.update(await homePayload());
       return;
     }
   }
