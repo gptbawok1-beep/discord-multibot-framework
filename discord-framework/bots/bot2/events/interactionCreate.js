@@ -41,7 +41,7 @@ export default class InteractionCreateEvent extends BaseEvent {
   async execute(client, interaction) {
     // ── Boombox specialized interactions ──
     const id = interaction.customId ?? "";
-    if (id.startsWith("bbsetup:") || id.startsWith("bbrm:") || id.startsWith("bblog:") || id.startsWith("bm:")) {
+    if (id.startsWith("bbsetup:") || id.startsWith("bbrm:") || id.startsWith("bblog:") || id.startsWith("bm:") || id.startsWith("bbdash:")) {
       const handled = await handleBoomBoxInteractionRouter(interaction);
       if (handled) return;
     }
