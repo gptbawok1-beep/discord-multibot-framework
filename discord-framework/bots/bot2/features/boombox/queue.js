@@ -1,119 +1,110 @@
 /**
- * Boombox — Queue Manager
+ * queue.js — Multi-platform BoomBox queue (V3).
  *
- * Manages a FIFO job queue with a worker pool.
- * Each job is an independent Promise — a failed job never blocks others.
+ * Each platform (YouTube, TikTok, Spotify) gets its own independent
+ * PlatformWorker so they never block each other.
  */
 
-import { EventEmitter } from 'events';
-import { analyticsManager } from './analytics.js';
-import { monitoringManager } from './monitoring.js';
+import { createLogger } from "../../../../shared/logger/index.js";
+import { enqueue, getAllSnapshots } from "./queue/workerManager.js";
+import { PRIORITY } from "./queue/workerConfig.js";
 
-export const QUEUE_EVENTS = Object.freeze({
-  JOB_ADDED:     'jobAdded',
-  JOB_STARTED:   'jobStarted',
-  JOB_COMPLETED: 'jobCompleted',
-  JOB_FAILED:    'jobFailed',
-});
+const logger = createLogger("BoomboxQueue");
 
-let _jobSeq = 0;
+// Map platform name → worker name
+const PLATFORM_WORKER_MAP = {
+  YouTube: "youtube",
+  youtube: "youtube",
+  TikTok:  "tiktok",
+  tiktok:  "tiktok",
+  Spotify: "spotify",
+  spotify: "spotify",
+};
 
 /**
- * @typedef {Object} BoomboxJob
- * @property {string}   id         — unique job ID
- * @property {string}   cacheKey   — platform:videoId
- * @property {string}   platform
- * @property {string}   videoId
- * @property {string}   originalUrl
- * @property {string}   userId
- * @property {string}   guildId
- * @property {number}   createdAt
- * @property {Function} resolve
- * @property {Function} reject
+ * Enqueue a BoomBox job on the correct platform worker.
+ *
+ * @param {"YouTube"|"TikTok"|"Spotify"} platform
+ * @param {number} priority  Use PRIORITY.* constants (0=highest, 3=lowest)
+ * @param {() => Promise<any>} run
+ * @param {{
+ *   onQueued?: (pos:number, total:number, etaSec:number) => any,
+ *   onStart?:  () => any,
+ *   jobId?:    string,
+ * }} [callbacks]
+ * @returns {Promise<any>}
  */
+export function enqueueForPlatform(platform, priority, run, callbacks = {}) {
+  const workerName = PLATFORM_WORKER_MAP[platform] ?? "youtube";
+  logger.info(`[BoomBox Queue] Enqueue | platform=${platform} | worker=${workerName} | priority=${priority}`);
+  return enqueue(workerName, run, { priority, ...callbacks });
+}
 
-class QueueManager extends EventEmitter {
-  constructor() {
-    super();
-    /** @type {BoomboxJob[]} */
-    this._pending    = [];
-    /** @type {Set<string>} active job IDs */
-    this._active     = new Set();
-    this._maxWorkers = 3;
-    this._processor  = null; // set by WorkerPool on init
+/**
+ * Backward-compatible shim — routes to a generic "youtube" worker.
+ *
+ * @param {() => Promise<any>} run
+ * @param {{ onQueued?: Function, onStart?: Function }} [callbacks]
+ * @returns {Promise<any>}
+ */
+export function enqueueBoomBoxJob(run, callbacks = {}) {
+  return enqueue("youtube", run, { priority: PRIORITY.FREE, ...callbacks });
+}
+
+/**
+ * Aggregated queue snapshot across all BoomBox platform workers.
+ *
+ * @returns {{ active:number, queued:number, maxConcurrent:number, workers: object[] }}
+ */
+export function getQueueSnapshot() {
+  const all = getAllSnapshots().filter(s =>
+    ["youtube", "tiktok", "spotify"].includes(s.name)
+  );
+  return {
+    active:        all.reduce((s, w) => s + w.active,        0),
+    queued:        all.reduce((s, w) => s + w.queued,        0),
+    maxConcurrent: all.reduce((s, w) => s + w.maxConcurrent, 0),
+    workers:       all,
+  };
+}
+
+// Phase 1 / backward compatible fallback queueManager instance
+class QueueManagerShim {
+  enqueue(params) {
+    // Phase 1 used params: { cacheKey, platform, videoId, originalUrl, userId, guildId }
+    // We map it to enqueueForPlatform
+    return enqueueForPlatform(params.platform, PRIORITY.FREE, async () => {
+      if (this._processor) {
+        return this._processor(params);
+      }
+      throw new Error("No processor registered.");
+    }, {
+      jobId: params.cacheKey,
+    });
   }
 
-  /**
-   * Register the async function that processes one job.
-   * Called once by WorkerPool during startup.
-   * @param {(job: BoomboxJob) => Promise<string>} fn
-   */
   setProcessor(fn) {
     this._processor = fn;
   }
 
-  /**
-   * Add a job to the queue. Returns a Promise that resolves with the audio URL.
-   * @param {{ cacheKey, platform, videoId, originalUrl, userId, guildId }} params
-   * @returns {Promise<string>}
-   */
-  enqueue(params) {
-    return new Promise((resolve, reject) => {
-      const job = {
-        id: `job_${++_jobSeq}`,
-        ...params,
-        createdAt: Date.now(),
-        resolve,
-        reject,
-      };
-      this._pending.push(job);
-      analyticsManager.incrementQueue();
-      monitoringManager.update('queue', 'ok', `Pending: ${this._pending.length}`);
-      this.emit(QUEUE_EVENTS.JOB_ADDED, job);
-      this._tick();
-    });
-  }
-
-  /** Drain the queue up to maxWorkers. */
-  _tick() {
-    while (this._active.size < this._maxWorkers && this._pending.length > 0) {
-      const job = this._pending.shift();
-      this._run(job);
-    }
-    monitoringManager.update('queue', 'ok',
-      `Active: ${this._active.size} | Pending: ${this._pending.length}`);
-  }
-
-  async _run(job) {
-    this._active.add(job.id);
-    this.emit(QUEUE_EVENTS.JOB_STARTED, job);
-    monitoringManager.update('worker', 'ok', `Running job ${job.id}`);
-
-    try {
-      if (!this._processor) throw new Error('No processor registered.');
-      const result = await this._processor(job);
-      job.resolve(result);
-      this.emit(QUEUE_EVENTS.JOB_COMPLETED, job, result);
-    } catch (err) {
-      job.reject(err);
-      this.emit(QUEUE_EVENTS.JOB_FAILED, job, err);
-    } finally {
-      this._active.delete(job.id);
-      this._tick(); // pick up next job
-    }
-  }
-
   getStats() {
+    const snapshot = getQueueSnapshot();
     return {
-      pending:    this._pending.length,
-      active:     this._active.size,
-      maxWorkers: this._maxWorkers,
+      pending: snapshot.queued,
+      active: snapshot.active,
+      maxWorkers: snapshot.maxConcurrent,
     };
   }
 
-  setMaxWorkers(n) {
-    this._maxWorkers = Math.max(1, Math.min(n, 10));
+  async setMaxWorkers(n) {
+    // Set max workers for all platform queues
+    const { workerManager } = await import("./queue/workerManager.js");
+    workerManager.updateWorkerConfig("youtube", { maxConcurrent: n });
+    workerManager.updateWorkerConfig("tiktok", { maxConcurrent: n });
+    workerManager.updateWorkerConfig("spotify", { maxConcurrent: n });
   }
 }
 
-export const queueManager = new QueueManager();
+export const queueManager = new QueueManagerShim();
+export { PRIORITY };
+export default queueManager;

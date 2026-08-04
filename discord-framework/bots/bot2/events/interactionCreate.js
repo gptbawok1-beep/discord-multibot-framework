@@ -3,6 +3,7 @@
  *
  * Routes incoming interactions:
  *   - ChatInputCommand  → shared slash handler
+ *   - BoomBox components → Boombox Interaction Router
  *   - StringSelectMenu  → bawok module navigation
  *   - Button            → bawok back-home / close-panel / boombox URL input
  *   - ModalSubmit       → boombox URL processing
@@ -26,6 +27,7 @@ import {
 } from '../features/bawok/panels.js';
 import { boomboxManager } from '../features/boombox/manager.js';
 import { validateURL } from '../features/boombox/validator.js';
+import { handleBoomBoxInteractionRouter } from '../features/boombox/interactionRouter.js';
 
 const logger     = createLogger('BOT2');
 const FOOTER     = '🩸 Kenyut';
@@ -37,6 +39,13 @@ export default class InteractionCreateEvent extends BaseEvent {
   }
 
   async execute(client, interaction) {
+    // ── Boombox specialized interactions ──
+    const id = interaction.customId ?? "";
+    if (id.startsWith("bbsetup:") || id.startsWith("bbrm:") || id.startsWith("bblog:") || id.startsWith("bm:")) {
+      const handled = await handleBoomBoxInteractionRouter(interaction);
+      if (handled) return;
+    }
+
     // ── Slash commands ──────────────────────────────────────────────────────
     if (interaction.isChatInputCommand()) {
       await handleSlashCommand(interaction, client, logger);
@@ -72,7 +81,6 @@ export default class InteractionCreateEvent extends BaseEvent {
     if (interaction.isModalSubmit() && interaction.customId === MODAL_BOOMBOX_ID) {
       const url = interaction.fields.getTextInputValue(MODAL_BOOMBOX_INPUT).trim();
 
-      // Quick validation before deferring
       const validation = validateURL(url);
       if (!validation.valid) {
         await interaction.reply({
@@ -87,7 +95,6 @@ export default class InteractionCreateEvent extends BaseEvent {
         return;
       }
 
-      // Defer — processing may take a moment
       await interaction.deferReply({ ephemeral: true });
 
       try {
