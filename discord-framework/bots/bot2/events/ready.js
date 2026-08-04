@@ -7,6 +7,7 @@
 import { BaseEvent } from '../../../shared/structures/index.js';
 import { createLogger } from '../../../shared/logger/index.js';
 import { boomboxManager } from '../features/boombox/manager.js';
+import { runBoomBoxLogsMigrationV2 } from '../features/boombox/logs/migration.js';
 
 const logger = createLogger('BOT2');
 
@@ -23,5 +24,12 @@ export default class ReadyEvent extends BaseEvent {
 
     // Initialise Boombox engine
     boomboxManager.init();
+
+    // Run Boombox Logs migration
+    try {
+      await runBoomBoxLogsMigrationV2(client);
+    } catch (err) {
+      logger.warn(`Logs migration failed: ${err.message}`);
+    }
   }
 }

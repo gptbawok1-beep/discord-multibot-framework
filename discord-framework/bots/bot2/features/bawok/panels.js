@@ -120,11 +120,13 @@ function homePayload() {
   };
 }
 
+import { buildBoomboxMainDashboard } from '../boombox/setup/panel.js';
+
 function modulePayload(moduleValue) {
   const mod = MODULES.find((m) => m.value === moduleValue);
   if (!mod) return homePayload();
   // Boombox gets its own panel with a URL input button
-  if (mod.value === 'boombox') return boomboxModulePayload(mod);
+  if (mod.value === 'boombox') return buildBoomboxMainDashboard();
   return {
     embeds:     [buildModuleEmbed(mod)],
     components: [buildNavRow(true)],
